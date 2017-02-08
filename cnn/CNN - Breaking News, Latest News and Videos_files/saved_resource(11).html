@@ -1,0 +1,548 @@
+
+<!-- saved from url=(0019)http://www.cnn.com/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script>var inDapIF=true;</script>
+</head><body marginwidth="0" marginheight="0"><script>/* 47493 - V.4.13.15 */
+    var qaCreativeURL = "https://s.cdn.turner.com/ads/adspaces/CNN/2017/02/07/548775979_020717-Bravo-Imposte-Skin-1900-updated-v2.jpg";
+    var qaWidth = 1900;
+    var qaHeight = 1100;
+    var qaLftClickThru = "https://bs.serving-sys.com/serving/adServer.bs?cn=trd&mc=click&pli=20235070&PluID=0&ord=2135328866";
+    var qaRgtClickThru = "https://bs.serving-sys.com/serving/adServer.bs?cn=trd&mc=click&pli=20235070&PluID=0&ord=2135328866";
+    var qaBackgroundColor = "";
+    var qa3PImpressions = ["https://bs.serving-sys.com/serving/adServer.bs?cn=display&c=19&mc=imp&pli=20235070&PluID=0&ord=681407499&rtu=-1", "https://z.moatads.com/maxusnbcusizmek545288669205/moatad.js#moatClientLevel1=742768&moatClientLevel2=6458&moatClientLevel3=20235070&moatClientLevel4=1x1_Site_Served_Unit&moatClientSlicer1=73687&moatClientSlicer2=-&skin=1", "https://pixel.mtrcs.samba.tv/v2/vtr/maxus/imposter/cnndfp/impression?c=2135328866&sa_ord=434839717&sa_li=207166357&sa_cr=112426392037&sa_pl=52063237", "", ""];
+    var qaSkinPos = "scroll";
+    var qaSkinTheme = "t-light"; //t-light or t-dark
+    var qaClickTopPos = 120;
+    var qaImgTopPos = 50;
+    var qaOpacity = "1";
+    var qaSetThemeOn2Zones = false; //default the value to false so existing creatives are not impacted
+    if ("true" == "true") {qaSetThemeOn2Zones = true;}
+
+    // DFP CLICK/IMPRESSION TRACKING
+    var qaClickTracker = "https://adclick.g.doubleclick.net/pcs/click?xai=AKAOjsv67NpCS8BkfLfuwY26neboFcVjtl4ugh4AEowsWjwKHC60sk-5LOHcDMaYVwLNDyIkKWpv_yJdSn1YeLUvMX-J9e90E_1SnyXNCMOjGmUSY7Rmdq7KTGVkPwhDABxIwXn1ROX-aCktqPK4f7xep1-5ondZO6zqsR_oIxNLiHQ4aWbvgtqk7-iuHp9B51dBdssw-TOU9GZM_drrky01Nxc0GhnDqlyn-g&sig=Cg0ArKJSzMm-vlNdbagwEAE&urlfix=1&adurl=";
+    var qaImpTracker = "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjstIfO7AtJnS065sp9sfLxmhukoiMBwH8LEBm5Wv1L66m7tVQeAgmxn5HhOGkxW_qMeeqxU0jUkGg31TzCNYHmZBMHQQEtqJJ3rEKdTwHEYWoBtQ7O0jM1N8qBZoO3YASfTRv3-lvNvHBYZBr-bm5R3WRKccQNRaqKzIfDETch9FTu_ipOBDaes4cN3SO2YYHHdzrNvCdX3w7pNG57dFUgugCeo_vYRJWq-rUg&sig=Cg0ArKJSzM4MbQ07rGUUEAE&urlfix=1&adurl=";
+
+    var qaClickPixel = "https://s.cdn.turner.com/ttn/ttn_adspaces/1.0/creatives/2012/2/10/1529111x1.gif";
+
+    // BUILD THE DIV TO CONTAIN THE SKIN AS THE FIRST DIV IN THE BODY
+    var bodyTag = parent.document.getElementsByTagName('body')[0];
+    bodyTag.style.overflowX = "hidden";
+    var bodyClassList = bodyTag.className;
+    var qaCurrentTheme = ((bodyClassList.indexOf("t-dark") > -1) ? "t-dark" : "t-light");
+    bodyTag.className = bodyClassList.replace(qaCurrentTheme, qaSkinTheme);
+    var qaSpaces = parent.document.getElementsByClassName("ad--all");
+    for (var index = 0; index < qaSpaces.length; index++) {
+        var adClassList = qaSpaces[index].className;
+        var qaCurrentThemeAd = ((adClassList.indexOf("t-dark") > -1) ? "t-dark" : "t-light");
+        qaSpaces[index].className = adClassList.replace(qaCurrentThemeAd, qaSkinTheme);
+
+        if (qaSpaces[index].querySelector('[id^="ad_bnr_btf"]')) {
+            if (qaSetThemeOn2Zones) {
+                //replace with original page theme in bnr_btf if only top two zones should change theme
+                qaSpaces[index].className = adClassList.replace(qaSkinTheme, qaCurrentThemeAd);
+            }
+            else {
+                qaSpaces[index].style.paddingTop = "15px";
+            }
+        }
+    }
+
+    var navHeader = parent.document.querySelector('[id^="nav"]' && '[id$="header"]');
+    //Create Image container
+    var skinImgDiv = document.createElement('div');
+    skinImgDiv.setAttribute('id', 'skinImgDiv');
+    skinImgDiv.style.background = qaBackgroundColor + " url('" + qaCreativeURL + "') no-repeat scroll center";
+    skinImgDiv.style.width = "100%";
+    skinImgDiv.style.height = qaHeight + "px";
+    skinImgDiv.style.position = ((qaSkinPos == "fixed") ? "fixed" : "absolute");
+    if (qaImgTopPos != 0) {
+        skinImgDiv.style.top = qaImgTopPos + "px";
+        bodyTag.insertBefore(skinImgDiv, bodyTag.firstChild);
+    }
+    else {
+        bodyTag.insertBefore(skinImgDiv, navHeader.nextSibling);
+    }
+
+    // ADD IMPRESSION TRACKING
+    var impImg = parent.document.createElement('img');
+    var trkPixImg = parent.document.createElement('img');
+    var skinLink = parent.document.createElement('a');
+    var skinImg = parent.document.createElement('img');
+
+    //SET THE CLICKABLE AREA FOR THE SKIN
+    if (qaLftClickThru == "") {
+        qaLftClickThru = qaRgtClickThru;
+    }
+    if (qaRgtClickThru == "") {
+        qaRgtClickThru = qaLftClickThru;
+    }
+
+    var leftWing = document.createElement('div');
+    var rightWing = document.createElement('div');
+    var clickThruContainer = document.createElement('div');
+
+    clickThruContainer.setAttribute('id', 'clickthru-container');
+    clickThruContainer.style.height = qaHeight + "px";
+    clickThruContainer.style.width = "100%";
+    clickThruContainer.style.position = ((qaSkinPos == "fixed") ? "fixed" : "absolute");
+    clickThruContainer.style.overflow = "hidden";
+    if (qaClickTopPos != 0) {
+        clickThruContainer.style.top = qaClickTopPos + "px";
+    }
+    bodyTag.insertBefore(clickThruContainer, skinImgDiv.nextSibling);
+
+    rightWing.setAttribute('id', 'rightWing');
+    rightWing.style.height = qaHeight + "px";
+    // rightWing.style.border = "2px solid red";
+    rightWing.style.width = "392px";
+    rightWing.style.right = "calc(50% - 400px)";
+    rightWing.style.marginRight = "-550px";
+    rightWing.style.position = ((qaSkinPos == "fixed") ? "fixed" : "absolute");
+    //rightWing.style.top = qaClickTopPos + "px";
+    rightWing.style.zIndex = "2";
+    if (qaRgtClickThru.indexOf("http") > -1) {
+        rightWing.innerHTML = "<a href=" + qaClickTracker + qaRgtClickThru + " target='_blank'><img src=" + qaClickPixel + " width=1 height=" + qaHeight + " border=0 style='width:99%; height:99%; position:relative; z-index:2;'></a>";
+    }
+    //bodyTag.insertBefore(rightWing, bodyTag.childNodes[1]);
+
+    leftWing.setAttribute('id', 'leftWing');
+    leftWing.style.height = qaHeight + "px";
+    // leftWing.style.border = "2px solid blue";
+    leftWing.style.width = "392px";
+    leftWing.style.left = "calc(50% - 400px)";
+    leftWing.style.marginLeft = "-550px";
+    leftWing.style.position = ((qaSkinPos == "fixed") ? "fixed" : "absolute");
+    //leftWing.style.top = qaClickTopPos + "px";
+    leftWing.style.zIndex = "2";
+    if (qaLftClickThru.indexOf("http") > -1) {
+        leftWing.innerHTML = "<a href=" + qaClickTracker + qaLftClickThru + " target='_blank'><img src=" + qaClickPixel + " width=1 height=" + qaHeight + " border=0 style='width:99%; height:99%; position:relative; z-index:2;'></a>";
+    }
+    //bodyTag.insertBefore(leftWing, rightWing);
+
+    clickThruContainer.appendChild(leftWing);
+    clickThruContainer.appendChild(rightWing);
+
+    //Change the banner ad display style to inline-block if the skin is fixed
+    if (qaSkinPos == "fixed") {
+      var bannerAds = parent.document.querySelectorAll('[id^="ad_bnr_"]');
+      if (bannerAds) {
+        for (i=0; i < bannerAds.length; i++) {
+          if (bannerAds[i].style.display != "none") {
+            bannerAds[i].style.display = "inline-block";
+          }
+        }
+      }
+    }
+
+    //BUILD THE IMPRESSION TRACKING TAG
+    impImg.setAttribute('src', qaImpTracker + qaClickPixel);
+
+    //BUILD THE 3RD PARTY IMPRESSION PIXELS
+    for (var index = 0; index < qa3PImpressions.length; index++) {
+        if (qa3PImpressions[index].length > 10) {
+            trkPixImg = document.createElement('img');
+            trkPixImg.setAttribute('src', qa3PImpressions[index]);
+            trkPixImg.setAttribute('width', "1");
+            trkPixImg.setAttribute('height', "1");
+            trkPixImg.style.position = 'absolute';
+            trkPixImg.style.visibility = 'hidden';
+            leftWing.appendChild(trkPixImg);
+        }
+    }
+    leftWing.appendChild(impImg);
+
+    // Position the parent div to top left for measuring proper viewability
+    var ifrm_parent_div = window.frameElement ? window.frameElement.parentNode : null;
+    var ele = ifrm_parent_div;
+
+    while (ele.parentNode) {
+        var parent_ele = ele.parentNode;
+        if (parent_ele.tagName.toLowerCase() == "body") {
+            ele.style.display = "inline";
+            ele.style.position = ((qaSkinPos == "fixed") ? "fixed" : "absolute");
+            ele.style.top = (qaImgTopPos || 1) + "px";
+            ele.style.left = "1px";
+            ele.style.height = "1px";
+            ele.style.width = "1px";
+            break;
+        } else if (parent_ele.tagName.toLowerCase() == "div") {
+            ele = parent_ele;
+        }
+    }
+
+    //Create standard content area css for tracking
+    var zn_skin_style_applied = document.createElement('style');
+    zn_skin_style_applied.type = 'text/css';
+    zn_skin_style_applied.innerHTML = '/* Blank CSS to track if style changes for skin are applied to the zone */'
+    parent.document.getElementsByTagName('head')[0].appendChild(zn_skin_style_applied);
+
+    //Detect if browser is IE
+    var isInternetExplorer = false;
+    if(/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
+        isInternetExplorer = true;
+    }
+
+    if ((bodyClassList.indexOf("pg-article") > -1) || (bodyClassList.indexOf("pg-gallery") > -1) || (bodyClassList.indexOf("pg-video") > -1)) {
+        var businessArticle = parent.document.querySelectorAll("article");
+        for (i = 0; i < businessArticle.length; i++) {
+            if ((businessArticle[i].className.indexOf("pg-rail") > -1) || (businessArticle[i].className.indexOf("pg-left-rail-tall") > -1) || (businessArticle[i].className.indexOf("pg-left-rail-short") > -1) || (businessArticle[i].className.indexOf("pg-rail-tall") > -1)) {
+                businessArticle[i].style.backgroundColor = "transparent";
+                businessArticle[i].style.paddingTop = "0px";
+
+                var container = businessArticle[i].querySelectorAll(".l-container");
+                container[0].style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+                container[0].style.padding = "0px 10px";
+                container[0].style.position = "relative";
+            }
+        }
+        parent.document.querySelector(".js-gigya-sharebar").parentNode.style.zIndex = "3";
+
+        //set padding for video page with large media section
+        var largeMediaContainer = parent.document.querySelectorAll("section.zn-large-media > .l-container > .pg-rail-tall");
+        for (i = 0; i < largeMediaContainer.length; i++) {
+            var leftRail = largeMediaContainer[i].querySelector(".pg-side-of-rail");
+            var rightRail = largeMediaContainer[i].querySelector(".pg-rail-tall__rail > .el__video-collection__meta-wrapper");
+            leftRail.style.padding = "10px 0px 0px 10px";
+            rightRail.style.padding = "10px 10px 0px 0px";
+        }
+    }
+
+    //SET STYLE TO BANNER IN ZONE-1
+    var zone1SectionBanner = parent.document.querySelector("section[class*='zone-1'] > .l-container > .zn-banner") || parent.document.querySelector("section[class*='zone-1'] > .zn-top > .zn-top__banner > .zn-banner");
+    if (zone1SectionBanner) {
+        zone1SectionBanner.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+        zone1SectionBanner.style.padding = "10px 10px 0px";
+        zone1SectionBanner.style.position = "relative";
+        if (isInternetExplorer) {
+            zone1SectionBanner.style.zIndex = "3";
+        }
+    }
+
+    //SET BACKGROUND OF ZONES TO TRANSPARENT
+    //Modified to change theme on first two zones as per CSD-742 when qaSetThemeOn2Zones is true
+    function setZoneSectionTheme(adjustArticleFontSize) {
+        //Select the sections which does not have the style changes applied
+        var zoneSection = parent.document.querySelectorAll("section:not(.zn_skin_style_applied)");
+        for (i = 0; i < zoneSection.length; i++) {
+            var zoneConditionChecker;
+
+            if (qaSetThemeOn2Zones) {
+                // Below condition is used to set theme on only first two zones in the page
+                zoneConditionChecker = function() {
+                    return ((zoneSection[i].className.indexOf("zn-homepage1") > -1) || (zoneSection[i].className.indexOf("zn-homepage2") > -1) || ((zoneSection[i].className.indexOf("zn-homepage") < 0) && ((zoneSection[i].className.indexOf("zone-1") > -1) ||
+                    (zoneSection[i].className.indexOf("zone-2") > -1))) || (bodyClassList.indexOf("pg-video") > -1 && ((zoneSection[i].id.indexOf("large-media") > -1) || (zoneSection[i].id.indexOf("recommended-videos-stories") > -1))) ||
+                    (bodyClassList.indexOf("pg-special") > -1 && (zoneSection[i].className.indexOf("zn-zone2") > -1 || zoneSection[i].className.indexOf("zn-zone3") > -1))) || (i <= 1 ? true : false);
+                };
+            } else {
+                // Below condition is used to set theme on all zones in the page
+                zoneConditionChecker = function() {
+                    return ((zoneSection[i].className.indexOf("zone-1") > -1) || (zoneSection[i].className.indexOf("zone-2") > -1) || (zoneSection[i].className.indexOf("zone2") > -1) || (zoneSection[i].className.indexOf("zone3") > -1) ||
+                                (zoneSection[i].className.indexOf("zone-3") > -1) || (zoneSection[i].className.indexOf("zone4") > -1) || (zoneSection[i].className.indexOf("zone-4") > -1) || (zoneSection[i].className.indexOf("zone5") > -1) ||
+                                (zoneSection[i].className.indexOf("zone-5") > -1) || (zoneSection[i].className.indexOf("zone6") > -1) || (zoneSection[i].className.indexOf("zone-6") > -1) || (zoneSection[i].className.indexOf("zone7") > -1) ||
+                                (zoneSection[i].className.indexOf("zone-7") > -1) || (zoneSection[i].className.indexOf("zone8") > -1) || (zoneSection[i].className.indexOf("zone-8") > -1) || (zoneSection[i].className.indexOf("zone9") > -1) ||
+                                (zoneSection[i].className.indexOf("zone-9") > -1) || (zoneSection[i].className.indexOf("zn-tv_schedule") > -1) || (zoneSection[i].id.indexOf("featured") > -1) || (zoneSection[i].className.indexOf("zn-automated-topic-zone") > -1) ||
+                                (zoneSection[i].className.indexOf("pg__branding ") > -1) || (bodyClassList.indexOf("pg-video") > -1 && ((zoneSection[i].id.indexOf("large-media") > -1) || (zoneSection[i].id.indexOf("recommended-videos-stories") > -1) ||
+                                (zoneSection[i].id.indexOf("otherCollections") > -1) || (zoneSection[i].id.indexOf("recommended-digital-studios") > -1))));
+                };
+            }
+
+            if (zoneConditionChecker()) {
+
+                //Apply the Blank css to track applied changes to zoneSection
+                zoneSection[i].className += " zn_skin_style_applied";
+                var zoneSectionContainer = zoneSection[i].querySelectorAll("section > .l-container > .zn__containers");
+                var zoneSectionHeader = zoneSection[i].querySelectorAll("section > .zn-top > .l-container > .zn-header").length > 0 ? zoneSection[i].querySelectorAll("section > .zn-top > .l-container > .zn-header") : zoneSection[i].querySelectorAll("section > .l-container > .zn-header");
+                if (!zoneSectionHeader || zoneSectionHeader.length < 1) {
+                    zoneSectionHeader = zoneSection[i].querySelectorAll(".zn-header");
+                }
+                var zoneClassList = zoneSection[i].className;
+                var zoneCurrentTheme = ((zoneClassList.indexOf("t-dark") > -1) ? "t-dark" : ((zoneClassList.indexOf("t-light") > -1) ? "t-light" : "t-high-contrast"));
+
+                // If the section has background don't add class zn--transparent and don't change the theme
+                var zoneSectionHasBackground =  zoneSection[i].className.indexOf("zn--has-background");
+                if ( zoneSectionHasBackground <= -1) {
+                    zoneSection[i].className += " zn--transparent";
+                    zoneSection[i].className = zoneClassList.replace(zoneCurrentTheme, qaSkinTheme);
+                }
+                else if (bodyClassList.indexOf("pg-travel") > -1 || bodyClassList.indexOf("pg-entertainment") > -1) {
+                    // change theme for travel section with background
+                    zoneSection[i].className = zoneClassList.replace(zoneCurrentTheme, qaSkinTheme);
+                }
+
+                // Set the position to relative for singleton in pg__branding
+                if (zoneClassList.indexOf("pg__branding") > -1) {
+                    var singletonSlot = zoneSection[i].querySelector('[id^="ad_mod_"]');
+                    if (singletonSlot && singletonSlot.className.indexOf("adfuel-rendered") > -1) {
+                        singletonSlot.style.position = "relative";
+                    }
+                }
+
+                if (zoneSectionHeader && zoneSectionHeader.length > 0) {
+                    for (var j = 0; j< zoneSectionHeader.length; j++) {
+                        zoneSectionHeader[j].style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+                        zoneSectionHeader[j].style.padding = "10px 10px 0px";
+                        zoneSectionHeader[j].style.position = "relative";
+                        if (isInternetExplorer) {
+                            zoneSectionHeader[j].style.zIndex = "3";
+                        }
+                    }
+                }
+
+                if (zoneSectionContainer && zoneSectionContainer.length > 0) {
+                    for (var j = 0; j < zoneSectionContainer.length; j++) {
+
+                        if (zoneSectionContainer[j].parentNode.className.indexOf("navigation") == -1) {
+                            zoneSectionContainer[j].style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+                            zoneSectionContainer[j].style.padding = "10px 10px 0px";
+                            zoneSectionContainer[j].style.position = "relative";
+                            if (isInternetExplorer) {
+                                zoneSectionContainer[j].style.zIndex = "3";
+                            }
+
+                            //Change the eqjs data-pts value to accommodate the padding
+                        var articles = zoneSectionContainer[j].querySelectorAll("article[data-eq-pts]");
+                            if (articles) {
+                                for (var k = 0; k < articles.length; k++) {
+                                    if (articles[k].getAttribute("data-eq-pts")) {
+                                        var dataEqPts = articles[k].getAttribute("data-eq-pts").replace(/:\s+(\d+)/mg, function(a,n){return (n > 20)?(": " + (+n-20)):(": " + (n));});
+                                        articles[k].setAttribute("data-eq-pts", dataEqPts);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (((parent.window.location.pathname.indexOf("specials") > -1) && (navigator.userAgent.indexOf("Firefox") > -1)) || (parent.window.location.pathname.indexOf("sport") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("tv") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("zn-balanced") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("zn-opinions") > -1) /*|| (zoneSectionContainer[j].parentNode.className.indexOf("zn-left-fluid-right-stack") > -1) */ || (zoneSectionContainer[j].parentNode.className.indexOf("zn-featured") > -1) || (parent.window.location.pathname.indexOf("africa") > -1) || (parent.window.location.pathname.indexOf("america") > -1) || (parent.window.location.pathname.indexOf("china") > -1) || (parent.window.location.pathname.indexOf("asia") > -1) || ((parent.window.location.pathname.indexOf("europe") > -1) && (zoneSection[i].className.indexOf("pg__branding ") == -1)) || (zoneSectionContainer[j].parentNode.className.indexOf("zn-tv_schedule_header") > -1)) {
+                            if ((zoneSectionContainer[j].parentNode.querySelector('[id^="ad_bnr_"]')) && (zoneSectionContainer[j].parentNode.querySelector('[id^="ad_bnr_"]').className.indexOf("adfuel-rendered") == -1)) {
+                              zoneSectionContainer[j].parentNode.style.paddingTop = "0px";
+                            }
+                        } else if (((parent.window.location.pathname.indexOf("specials") > -1) && (navigator.userAgent.indexOf("Firefox") == -1)) || (zoneSectionContainer[j].parentNode.className.indexOf("tech") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-us-") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-world-") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-politics-") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-health-") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-entertainment-") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-living-") > -1) || (zoneSectionContainer[j].parentNode.className.indexOf("-travel-") > -1)) {
+                            if (zoneSectionHasBackground <= -1) { zoneSectionContainer[j].parentNode.style.paddingTop = "25px"; }
+                        }
+                        if (zoneSectionContainer[j].parentNode.className.indexOf("pg__branding ") > -1) {
+                            zoneSectionContainer[j].parentNode.style.padding = "0px 0px";
+                        }
+
+                        if ((bodyClassList.indexOf("pg-video ") > -1) || (bodyClassList.indexOf("pg-fashion") > -1) || (bodyClassList.indexOf("pg-architecture") > -1) || (bodyClassList.indexOf("pg-arts") > -1) || (bodyClassList.indexOf("pg-autos") > -1) || (bodyClassList.indexOf("pg-luxury") > -1) || (bodyClassList.indexOf("pg-design") > -1)) {
+                            zoneSectionContainer[j].style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+                            zoneSectionContainer[j].style.padding = "10";
+                        }
+
+                        /*if ((bodyClassList.indexOf("homepage") > -1) && (zoneSection[i].className.indexOf("zone-1") > -1) && zoneSectionContainer[j].querySelector(".zn__column--idx-1") && zoneSectionContainer[j].querySelector(".zn__column--idx-2")) {
+                            //ADJUST WIDHT OF COLUMN 2 AND 3 SO THAT IT DOES NOT OVERLAP WITH COLUMN 1
+                            zoneSectionContainer[j].querySelector(".zn__column--idx-1").style.width = "310px";
+                            zoneSectionContainer[j].querySelector(".zn__column--idx-1").style.marginLeft = "20px";
+                            zoneSectionContainer[j].querySelector(".zn__column--idx-2").style.width = "310px";
+                        }*/
+                    }
+                }
+
+                if (bodyClassList.indexOf("pg-video") > -1) {
+                    zoneSection[i].style.background = "transparent";
+                    var znTop = zoneSection[i].querySelector(".zn-top");
+                    if (znTop) {
+                        znTop.style.minHeight = "0px";
+                    }
+                }
+
+                //Set style to parent container for video page if zn-container is not available
+                if (bodyClassList.indexOf("pg-video") > -1 && bodyClassList.indexOf("pg-arts") < 0 && (!zoneSectionContainer || zoneSectionContainer.length < 1)) {
+                    var lContainer = zoneSection[i].querySelector("section > .l-container");
+                    if (lContainer) {
+                        lContainer.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+                        lContainer.style.padding = "10px 10px 0px";
+                        lContainer.style.position = "relative";
+                    }
+                }
+            }
+        }
+    }
+
+    //set theme on zoneSection onload
+    setZoneSectionTheme(true);
+
+    var headerSection = parent.document.querySelector(".pg__background__image > .l-container");
+    if (headerSection) {
+        headerSection.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+        headerSection.style.padding = "0 10px";
+    }
+    else {
+        var headerLogoSection = parent.document.querySelector(".pg__background__image > .pg__branding > .l-container");
+        if (headerLogoSection) {
+            headerLogoSection.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+            headerLogoSection.style.padding = "10px";
+            headerLogoSection.style.position = "relative";
+        }
+    }
+
+    var hpJumbotron = parent.document.querySelector("div[id^=cn-jumbotron]");
+    if (hpJumbotron && parent.window.location.pathname.indexOf("specials") == -1) {
+        hpJumbotron.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+        hpJumbotron.style.padding = "0px 10px";
+    }
+    if (parent.window.location.pathname.indexOf("/travel/") > -1) {
+        var temp = parent.document.querySelectorAll("div");
+        //console.log(temp.length+ "*")
+        for (i = 0; i < temp.length; i++) {
+            if (temp[i].className.indexOf("image-gradient image-gradient--zone") > -1) {
+                temp[i].style.position = "relative";
+                break;
+            }
+        }
+    }
+    var headerGap = parent.document.querySelector(".pg-no-rail > .l-container");
+    if (headerGap) {
+        headerGap.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+    }
+
+    //CODE SPECIFIC FOR SPECIALS AND ARTICLE PAGES
+    if ((bodyTag.className.indexOf("pg-special") > -1) || (bodyTag.className.indexOf("pg-shows") > -1)) {
+        parent.document.querySelector(".metadata-header__wrapper").style.position = "relative";
+        parent.document.querySelector(".metadata-header__wrapper").parentNode.style.position = "relative";
+        if ((parent.window.location.pathname.indexOf("cnn-films") > -1) || (parent.window.location.pathname.indexOf("photos") > -1)) {
+            parent.document.querySelector(".metadata-header__wrapper").parentNode.style.backgroundColor = "rgba(0,0,0," + qaOpacity + ")";
+
+            bodyTag.className = bodyClassList.replace(qaCurrentTheme, "t-dark");
+        } else {
+            parent.document.querySelector(".metadata-header__wrapper").parentNode.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+        }
+        parent.document.querySelector(".metadata-header__wrapper").parentNode.style.padding = "0px 10px";
+    } else if ((bodyTag.className.indexOf("pg-article") > -1)) {
+        var pgHeadline = parent.document.querySelector(".pg-headline");
+        if (pgHeadline) {
+          pgHeadline.parentNode.style.position = "relative";
+          pgHeadline.parentNode.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+          pgHeadline.parentNode.style.padding = "0px 10px";
+        }
+
+        // Set right padding for gallery image caption
+        var galleryCaption = parent.document.querySelectorAll(".el__gallery_image-title");
+        for (i = 0; i < galleryCaption.length; i++) {
+            galleryCaption[i].style.paddingRight = "20px";
+        }
+
+    } else if ((bodyTag.className.indexOf("pg-travel") > -1) || ((bodyTag.className.indexOf("pg-section") > -1) && (bodyTag.className.indexOf("pg-home") == -1) && (bodyTag.className.indexOf("pg-intl_homepage") == -1) && (bodyTag.className.indexOf("pg-style") == -1) && (parent.window.location.pathname.indexOf("/style/") == -1))) {
+        if (parent.document.querySelector(".zn-header-wrapper")) {
+            parent.document.querySelector(".zn-header-wrapper").style.position = "relative";
+            parent.document.querySelector(".zn-header-wrapper").parentNode.style.position = "relative";
+            parent.document.querySelector(".zn-header-wrapper").parentNode.style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(255,255,255," + qaOpacity + ")" : "rgba(0,0,0," + qaOpacity + ")");
+            parent.document.querySelector(".zn-header-wrapper").parentNode.style.padding = "0px 10px";
+        }
+    }
+
+    /*if (bodyClassList.indexOf("pg-politics") > -1) {
+        var polDivs = parent.document.querySelectorAll("div");
+        for (i = 0; i < polDivs.length; i++) {
+            if (polDivs[i].className.indexOf("pg-no-rail") > -1) {
+                var container = polDivs[i].querySelectorAll(".l-container");
+                container[0].style.backgroundColor = "transparent";
+            }
+        }
+    }*/
+
+    if ((bodyClassList.indexOf("pg-gallery") > -1) || (bodyClassList.indexOf("pg-video") > -1)) {
+        skinImgDiv.style.marginTop = "-10px";
+    }
+    //REMOVE CURRENT PAGE BACKGROUND
+    if (parent.document.querySelector(".pg__background__image_wrapper")) {
+      parent.document.querySelector(".pg__background__image_wrapper").style.display = "none";
+    }
+
+    //CONDITION FOR WHEN FIXED
+    if (qaSkinPos == "fixed") {
+        var footerTools = parent.document.querySelector("footer.l-footer");
+        footerTools.style.position = "relative";
+        footerTools.style.zIndex = "2";
+    }
+
+    //ATF BANNER BACKGROUND FIX
+    try {
+        parent.document.querySelector(".ad-ad_bnr_atf_01").style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgba(254,254,254," + qaOpacity + ")" : "rgba(26,26,26," + qaOpacity + ")");
+        parent.document.querySelector(".pg__background__image").style.position = "static";
+    }
+    catch(e) {
+        var parentIfrm = window.frameElement;
+        console.log(parentIfrm.id + ": Error applying style changes - " + e);
+    }
+
+    // Fix for theme change for external/OUTBRAIN/CNN article links
+    var articleLinks = parent.document.querySelectorAll(".ob-text-content > a.rec-link");
+    var qaFontColor = (qaSkinTheme == "t-light") ? "rgb(26,26,26)" : "rgb(254,254,254)";
+    if (articleLinks) {
+        for(var i = 0; i< articleLinks.length; i++) {
+            articleLinks[i].style.color = qaFontColor;
+            var articleStyle = window.getComputedStyle(articleLinks[i]);
+            if (articleStyle.getPropertyValue('color') !== qaFontColor) {
+                articleLinks[i].style.setProperty("color", qaFontColor, "important");
+            }
+        }
+    }
+
+    articleLinks = parent.document.querySelectorAll(".ob-text-content > div.strip-rec-link-title");
+    if (articleLinks) {
+        for(var i = 0; i< articleLinks.length; i++) {
+            articleLinks[i].style.color = qaFontColor;
+            var articleStyle = window.getComputedStyle(articleLinks[i]);
+            if (articleStyle.getPropertyValue('color') !== qaFontColor) {
+                articleLinks[i].style.setProperty("color", qaFontColor, "important");
+            }
+        }
+    }
+
+    //Dispatch resize event on parent window so any misaligned items are aligned properly
+    try {
+      parent.window.dispatchEvent(new CustomEvent('resize'));
+    } catch (err) {
+      console.log("Error dispatching resize event");
+    }
+
+    //IE 9
+    try {
+      var evt = parent.document.createEvent('CustomEvent');
+      evt.initEvent("resize", true, true);
+      parent.window.dispatchEvent(evt);
+    } catch(err) {
+      console.log("Error dispatching resize event")
+    }
+
+    // Set pinned video title backgroundColor based on qaSkinTheme
+    function debounce(func, wait, immediate) {
+      var timeout;
+      return function() {
+    		var context = this, args = arguments;
+    		var later = function() {
+    			timeout = null;
+    			if (!immediate) func.apply(context, args);
+    		};
+    		var callNow = immediate && !timeout;
+    		clearTimeout(timeout);
+    		timeout = setTimeout(later, wait);
+    		if (callNow) func.apply(context, args);
+    	};
+    };
+
+    var setPinnedVideoTitleTheme = debounce(function() {
+      if (parent.document.querySelector(".media__caption")) {
+        parent.document.querySelector(".media__caption").style.backgroundColor = ((qaSkinTheme == "t-light") ? "rgb(254,254,254)" : "rgb(26,26,26)");
+      }
+    }, 250);
+
+    parent.window.addEventListener('scroll', setPinnedVideoTitleTheme);
+
+    //set theme on zoneSection if IZL (Intelligent Zone Loading or lazyload) is set to true
+    var setThemeOnIZL = debounce(function() {
+        setZoneSectionTheme(false);
+    }, 50);
+
+    if (parent.window.CNN.LazyLoad && qaSkinPos == "fixed" && !qaSetThemeOn2Zones) {
+        parent.window.addEventListener('scroll', setThemeOnIZL);
+    }
+
+    //MOAT
+    var moatScript = document.createElement('script');
+    moatScript.type = "text/javascript";
+    moatScript.src = "https://z.moatads.com/turner763610601596/moatad.js#moatClientLevel1=0&moatClientLevel2=0&moatClientLevel3=0&moatClientLevel4=112425201397&moatClientSlicer1=7663597&moatClientSlicer2=7663477&zMoatPS=&zMoatWD=1&zMoatHT=1&zMoatPG=&zMoatST=&zMoatAPP=";
+    document.getElementsByTagName('body')[0].appendChild(moatScript);
+
+</script><script type="text/javascript" src="./moatad(7).js"></script>
+<script src="./osd_listener.js"></script><script type="text/javascript">osdlfm(-1,'','BlcPvMDKaWO-NLMyKhAS1oJKgCwAAAAAQATgByAEJwAIC4AIA4AQBoAYg','',1745213094,true,'ud\x3d1\x26la\x3d0\x26',3,'CAASFeRo23kwx8p7Uvp1N3sduktAGvO0EQ','//pagead2.googlesyndication.com/activeview?avi\x3dBlcPvMDKaWO-NLMyKhAS1oJKgCwAAAAAQATgByAEJwAIC4AIA4AQBoAYg\x26cid\x3dCAASFeRo23kwx8p7Uvp1N3sduktAGvO0EQ');</script><script>if (window.top && window.top.postMessage) {window.top.postMessage('{"googMsgType":"adpnt"}','*');}</script>
+</body></html>
