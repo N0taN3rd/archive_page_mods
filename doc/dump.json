@@ -1,0 +1,3646 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "name": "toDoc/wombat.js",
+    "content": "/**\n * @desc\n * Override attribute using getters and setters\n * @example\n * var orig_getter = get_orig_getter(obj, attr);\n * var orig_setter = get_orig_setter(obj, attr);\n *  var setter = function(orig) {\n *    var val = rewrite_url(orig, false, mod);\n *    if (orig_setter) {\n *      return orig_setter.call(this, val);\n *    } else if (default_to_setget) {\n *      return wb_setAttribute.call(this, attr, val);\n *    }\n *  }\n *  var getter = function() {\n *       var res = undefined;\n *      if (orig_getter) {\n *        res = orig_getter.call(this);\n *     } else if (default_to_setget) {\n *      res = wb_getAttribute.call(this, attr);\n *    }\n *    res = extract_orig(res);\n *       return res;\n *     }\n *  def_prop(obj, attr, setter, getter);\n */\nfunction override_attr (obj, attr, mod, default_to_setget) {}\n\n/**\n * @desc more fun times for url rewriting\n * {@link make_parser}\n * {@link def_prop}\n * @param loc_obj\n * @param orig_setter\n * @param orig_getter\n */\nfunction init_loc_override(loc_obj, orig_setter, orig_getter) {}\n\n/**\n* @example\n* if (!$wbwindow.DOMParser ||\n*   !elemtype ||\n*   !elemtype.prototype) {\n*   return;\n* }\n*\n* var obj = elemtype.prototype;\n*\n* var orig_getter = get_orig_getter(obj, prop);\n* var orig_setter = get_orig_setter(obj, prop);\n*\n* if (!orig_setter) {\n*   return;\n* }\n*\n* var setter = function(orig) {\n*   var res = orig;\n*   if (!this._no_rewrite) {\n*     //init_iframe_insert_obs(this);\n*     if (this.tagName == \"STYLE\") {\n*       res = rewrite_style(orig);\n*     } else {\n*       res = rewrite_html(orig);\n*     }\n*   }\n*   orig_setter.call(this, res);\n* }\n*\n* def_prop(obj, prop, setter, orig_getter);\n*/\nfunction override_html_assign(elemtype, prop) {}\n\n/**\n * @desc rewrite urls of the elements\n * @param elem\n * @param name\n * @param abs_url_only\n */\nfunction rewrite_attr(elem, name, abs_url_only) {}\n\n/**\n * @desc\n * {@link rewrite_attr}\n * @example\n * if (!elem) {\n *   return;\n * }\n *\n * var changed;\n *\n * if (elem.tagName == \"STYLE\") {\n *   var new_content = rewrite_style(elem.textContent);\n *   if (elem.textContent != new_content) {\n *     elem.textContent = new_content;\n *     changed = true;\n *   }\n * } else if (elem.tagName == \"OBJECT\") {\n *   changed = rewrite_attr(elem, \"data\", true);\n * } else if (elem.tagName == \"FORM\") {\n *   changed = rewrite_attr(elem, \"action\", true);\n * } else if (elem.tagName == \"INPUT\") {\n *   changed = rewrite_attr(elem, \"value\", true);\n * } else if (elem.tagName == \"IFRAME\" || elem.tagName == \"FRAME\") {\n *   changed = rewrite_frame_src(elem, \"src\");\n * } else {\n *   changed = rewrite_attr(elem, \"src\");\n *   changed = rewrite_attr(elem, \"srcset\") || changed;\n *   changed = rewrite_attr(elem, \"href\") || changed;\n *   changed = rewrite_attr(elem, \"style\") || changed;\n *   changed = rewrite_attr(elem, \"poster\") || changed;\n * }\n *\n * if (elem.getAttribute) {\n *   if (elem.getAttribute(\"crossorigin\")) {\n *     elem.removeAttribute(\"crossorigin\");\n *     changed = true;\n *   }\n *\n *   if (elem.getAttribute(\"integrity\")) {\n *     elem.removeAttribute(\"integrity\");\n *     changed = true;\n *   }\n * }\n *\n * return changed;\n *\n */\nfunction rewrite_elem (elem) {}\n\n/**\n * @desc\n * {@link rewrite_elem}\n * @example\n * if (!string) {\n *   return string;\n * }\n *\n * if (write_buff) {\n *   string = write_buff + string;\n *   write_buff = \"\";\n * }\n * var inner_doc = new DOMParser().parseFromString(string, \"text/html\");\n *\n * if (!inner_doc) {\n *   return string;\n * }\n *\n * string = string.toString();\n *\n * var changed = false;\n *\n * for (var i = 0; i < inner_doc.all.length; i++) {\n *   changed = rewrite_elem(inner_doc.all[i]) || changed;\n * }\n *\n * if (!changed) {\n *   return string;\n * }\n *\n * var new_html = \"\";\n *\n * // if original had <html> tag, add full document HTML\n * if (string && string.indexOf(\"<html\") >= 0) {\n *   new_html = inner_doc.documentElement.outerHTML;\n * } else {\n *   // otherwise, just add contents of head and body\n *   new_html = inner_doc.head.innerHTML;\n *   new_html += inner_doc.body.innerHTML;\n *\n *   if (check_end_tag) {\n *     if (inner_doc.all.length > 3) {\n *       var end_tag = \"</\" + inner_doc.all[3].tagName.toLowerCase() + \">\";\n *       if (ends_with(new_html, end_tag) && !ends_with(string, end_tag)) {\n *         new_html = new_html.substring(0, new_html.length - end_tag.length);\n *       }\n *     } else if (string[0] != \"<\" || string[string.length - 1] != \">\") {\n *       write_buff += string;\n *       return;\n *     }\n *   }\n * }\n *\n * return new_html;\n */\nfunction rewrite_html (string, check_end_tag) {}\n\n/**\n * @example\n * //imp\n * if (!src || src == \"\" || src == \"about:blank\" || src.indexOf(\"javascript:\") >= 0) {\n *   win._WBWombat = wombat_internal(win);\n *   win._wb_wombat = new win._WBWombat(wb_info);\n * } else {\n *   // These should get overriden when content is loaded, but just in case...\n *   //win._WB_wombat_location = win.location;\n *   //win.document.WB_wombat_location = win.document.location;\n *   //win._WB_wombat_top = $wbwindow.WB_wombat_top;\n *\n *   init_proto_pm_origin(win);\n *   //init_postmessage_override(win);\n * }\n *\n * @param win\n * @param src\n */\nfunction init_new_window_wombat (win, src) {}\n\n/**\n * @desc\n *  setup iframe for either captured pages or replay iframe\n * {@link init_new_window_wombat}\n * @example\n * // imp\n * var win;\n *\n * if (iframe._get_contentWindow) {\n *    win = iframe._get_contentWindow.call(iframe);\n *  } else {\n *    win = iframe.contentWindow;\n *  }\n *\n * try {\n *    if (!win || win == $wbwindow || win._skip_wombat || win._wb_wombat) {\n *      return;\n *    }\n *  } catch (e) {\n *   return;\n * }\n *\n * //var src = iframe.src;\n * var src = wb_getAttribute.call(iframe, \"src\");\n *\n * init_new_window_wombat(win, src);\n */\nfunction init_iframe_wombat (iframe) {}\n\n/**\n * @desc\n * replace dom function with own\n * {@link init_iframe_wombat}\n * @example\n * //imp\n * var orig = $wbwindow.Node.prototype[funcname];\n *\n * $wbwindow.Node.prototype[funcname] = function() {\n *   var child = arguments[0];\n *\n *   if (child) {\n *\n *     if (child instanceof $wbwindow.Element) {\n *       rewrite_elem(child);\n *     } else if (child instanceof $wbwindow.Text) {\n *       if (this.tagName == \"STYLE\") {\n *         child.textContent = rewrite_style(child.textContent);\n *       }\n *     }\n *\n *     // if fragment, rewrite children before adding\n *     //if (child instanceof DocumentFragment) {\n *     //   rewrite_children(child);\n *     //}\n *   }\n *\n *   var created = orig.apply(this, arguments);\n *\n *   if (created && created.tagName == \"IFRAME\") {\n *     init_iframe_wombat(created);\n *   }\n *\n *   return created;\n * }\n * @param funcname\n */\nfunction replace_dom_func (funcname) {}\n\n/**\n * @desc\n * if proxy mode no extraction\n * else if href contains ignored prefixes [\"#\", \"about:\", \"data:\", \"mailto:\", \"javascript:\", \"{\", \"*\"] ignore\n * else remove wb url part and return original\n * @param href\n * @return {string} original href\n */\nfunction extract_orig (href) {}\n\n/**\n* {@link override_attr}\n* @example\n* var do_init_forms = function() {\n*   for (var i = 0; i < $wbwindow.document.forms.length; i++) {\n*     var new_action = rewrite_url($wbwindow.document.forms[i].action);\n*     if (new_action != $wbwindow.document.forms[i].action) {\n*       $wbwindow.document.forms[i].action = new_action;\n*     }\n*     override_attr($wbwindow.document.forms[i], \"action\", \"\", true);\n*   }\n* }\n*\n* if (document.readyState == \"loading\") {\n*   document.addEventListener(\"DOMContentLoaded\", do_init_forms);\n* } else {\n*   do_init_forms();\n* }\n*/\nfunction init_form_overrides($wbwindow) {}\n\n/**\n * @desc\n *  create an a tag in top frame(not replay iframe)\n *  and use the tag to parse href after {@link extract_orig}\n *  special case: for newly opened blank windows, use the opener\n *     to create parser to have the proper baseURI\n * @param href\n * @returns {Element}\n */\nfunction make_parser (href) {}\n\n/**\n * @example\n * str.indexOf(\"www.\") == 0 -> true\n *\n * @example\n * // hostname:port (port required)\n * str.match(/^[\\w-]+(\\.[\\w-_]+)+(:\\d+)(\\/|$)/) and match len < 64 -> true\n *\n * @example\n * // ip:port\n * str.match(/^\\d+\\.\\d+\\.\\d+\\.\\d+(:\\d+)?(\\/|$)/) and match len < 64 -> true\n *\n * @param {string} str\n * @returns {boolean} if is host url\n */\nfunction is_host_url (str) {}\n\n/**\n * @desc Override a DOM property\n * @param {Object} obj  the object to define custom prop of\n * @param {String} prop the prop to be overridden\n * @param {function} set_func own setter function\n * @param {function} get_func own getter function\n * @param {boolean} enumerable is enumerable\n * @return {boolean|undefined} if override was successful or not\n */\nfunction def_prop (obj, prop, set_func, get_func, enumerable) {}\n\n/**\n *\n * @desc\n * override window.fetch\n * rewrite url and call original\n */\nfunction fetch (input, init) {}\n\nclass WombatLocation {\n  /**\n   * @desc override the win.location\n   * @param {Object} orig_loc\n   * @link WombatLocation.init_loc_override\n   */\n  constructor (orig_loc) {}\n\n  /**\n   * @desc\n   * override getters and setters for\n   * [\"href\", \"hash\", \"pathname\", \"host\", \"hostname\", \"protocol\", \"origin\", \"search\", \"port\"]\n   * @link WombatLocation.make_get_loc_prop\n   * @link WombatLocation.make_set_loc_prop\n   */\n  init_loc_override (loc_obj, orig_setter, orig_getter) {}\n\n  /**\n   * @desc\n   * call original if no rewrite else\n   *\n   * call original and if prop is href return extract origin\n   * if self.original_href != the current href set_loc to new href\n   * else value = this[\"_\" + prop] return value;\n   *\n   * @param prop\n   */\n  make_get_loc_prop (prop) {}\n\n  /**\n   * @desc\n   * call original if no rewrite else\n   * this[\"_\" + prop] = value;\n   * get original value\n   * if self.original_href != the current href set_loc to new href\n   * else\n   * value = this[\"_\" + prop] return value;\n   * check for Special case for href=\".\" assignment\n   * rewrite and update globals if changes actual location and call original setter\n   * @param prop\n   */\n  make_set_loc_prop (prop) {}\n\n  /**\n   * @example\n   * // the imp\n   * var new_url = rewrite_url(url);\n   *  var orig = extract_orig(new_url);\n   * if (orig == this.href) {\n   *       return orig;\n   * }\n   * return this._orig_loc.replace(new_url);\n   * @param {string} url\n   */\n  replace (url) {}\n\n  /**\n   * @example\n   * // the imp\n   * var new_url = rewrite_url(url);\n   * var orig = extract_orig(new_url);\n   * if (orig == this.href) {\n   *       return orig;\n   * }\n   * return this._orig_loc.assign(new_url);\n   * @param {string} url\n   */\n  assign (url) {}\n\n  reload (url) {}\n\n  /**\n   * @desc get a prop from original window.loc\n   * @param prop\n   */\n  orig_getter (prop) {}\n\n  /**\n   * @desc set a prop from original window.loc\n   * @param prop\n   */\n  orig_setter (prop) {}\n}\n\nclass Math {\n  constructor () {\n    /**\n     * @desc pywb determined number\n     * @type {number}\n     */\n    this.seed = 123;\n  }\n\n  /**\n   * @link Math.seeded_random\n   */\n  random () {}\n\n  /**\n   * @example\n   * // imp\n   *  $wbwindow.Math.seed = ($wbwindow.Math.seed * 9301 + 49297) % 233280;\n   *  return $wbwindow.Math.seed / 233280;\n   */\n  seeded_random () {}\n}\n\nclass Crypto {\n  /**\n   * uses {@link Math.random}\n   * @param array\n   */\n  getRandomValues (array) {}\n}\n\nclass History {\n  /**\n   * @link History.override_history_func\n   */\n  pushState () {}\n\n  /**\n   * @link History.override_history_func\n   */\n  replaceState () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  go () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  back () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  forward () {}\n\n  /**\n   * @desc\n   * rewrite url and house keeping with communication with top frame\n   */\n  override_history_func () {}\n\n  /**\n   * @desc\n   * rewrite url and house keeping with communication with top frame\n   * minute diff with other method\n   */\n  override_history_nav () {}\n\n}\n\nclass XMLHttpRequest {\n  /**\n   * @desc\n   * rewrite url if rewrite enabled\n   * call original check if url starts with data:\n   * if does set 'X-Pywb-Requested-With', 'XMLHttpRequest'\n   */\n  open (method, url, async, user, password) {}\n}\n\nclass HTMLBaseElement {\n  /**\n   * @desc\n   * call original and if name name is href rewrite\n   * @param {string} name\n   */\n  getAttribute (name) {}\n\n  /**\n   * call {@link HTMLBaseElement.getAttribute}\n   * {@link def_prop}\n   */\n  get href () {}\n}\n\nclass Node {\n  /**\n   * @desc returns the absolute base URL of a node\n   * override it with own getter who call original and {@link extract_orig}\n   * {@link def_prop}\n   */\n  get baseURI () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  appendChild () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  inertBefore () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  replaceChild () {}\n}\n\nclass Element {\n  /**\n   * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute\n   * @desc\n   * rewrite [\"src\", \"href\", \"poster\"] attributes\n   * if script then add js_ to url\n   * if style and if value is string rewrite value urls\n   * call original\n   */\n  setAttribute () {}\n\n  /**\n   * @desc\n   * call original\n   * if [\"src\", \"href\", \"poster\"] attributes\n   * or attributes who start with data- or http://, https://, //\n   * extract origin from original call results\n   * return value\n   */\n  getAttribute () {}\n}\n\nclass HTMLElement {\n  /**\n   * {@link override_html_assign}\n   */\n  get innerHTML (){}\n}\n\nclass document {\n  /**\n   * @desc\n   * if form override action {@link override_attr}\n   * if no rewrite add _no_rewrite = true to object property\n   * return new element\n   */\n  createElement () {}\n\n  /**\n   * @desc\n   * Creates an element with the specified namespace URI and qualified name\n   * extract origin {@link extract_orig} from namespaceURI call\n   * return call to original method using extracted origin\n   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS\n   */\n  createElementNS () {}\n\n  /**\n   * {@link rewrite_html}\n   * @param string\n   */\n  write (string) {}\n\n  /**\n   * {@link rewrite_html}\n   * @param string\n   */\n  writeln (string) {}\n}\n\nclass Date {\n  /**\n   * @desc\n   * Override to create Date object using time of capture\n   */\n  constructor () {}\n\n  /**\n   * @desc\n   * Override to use original (not time of capture)\n   */\n  UTC () {}\n\n  /**\n   * @desc\n   * Override to use original (not time of capture)\n   */\n  parse () {}\n\n  /**\n   * @desc\n   * Override to time of capture\n   */\n  now () {}\n}\n\n/**\n * @desc\n * Disabled\n */\nclass Worker {\n}\n\nclass HTMLScriptElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLIFrameElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLStyleElement {\n  /**\n   * {@link override_html_assign}\n   */\n  get textContent () {}\n\n  /**\n   * {@link override_html_assign}\n   */\n  set textContent (arg) {}\n}\n\nclass HTMLSourceElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get srcset () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set srcset (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n\n  /**\n   * {@link rewrite_html}\n   */\n  get insertAdjacentHTML () {}\n\n  /**\n   * {@link rewrite_html}\n   */\n  set insertAdjacentHTML (arg) {}\n}\n\nclass CSSStyleDeclaration {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyle () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyle (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get backgroundImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set backgroundImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get cssText () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set cssText (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyleImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyleImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get border () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set border (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImageSource () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImageSource (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get background () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set background (args) {}\n}\n\nclass HTMLEmbedElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLImageElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLVideoElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get poster () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set poster (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass CSSStyleSheet {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get href () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set href (args) {}\n}\n\nclass HTMLObjectElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get data () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set data (args) {}\n}\n\nclass HTMLAudioElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get poster () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set poster (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass CSS2Properties {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyle () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyle (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get backgroundImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set backgroundImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get cssText () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set cssText (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyleImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyleImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get border () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set border (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImageSource () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImageSource (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get background () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set background (args) {}\n}\n\nclass HTMLInputElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLLinkElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get href () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set href (args) {}\n}\n\n/**\n * @desc\n * keep a copy of the original element get/set properties in back pocket\n * {@link init_loc_override}\n *\n */\nclass HTMLAnchorElement {\n\n}\n\n",
+    "static": true,
+    "longname": "toDoc/wombat.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 1,
+    "kind": "function",
+    "name": "override_attr",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~override_attr",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "Override attribute using getters and setters",
+    "examples": [
+      "var orig_getter = get_orig_getter(obj, attr);\nvar orig_setter = get_orig_setter(obj, attr);\n var setter = function(orig) {\n   var val = rewrite_url(orig, false, mod);\n   if (orig_setter) {\n     return orig_setter.call(this, val);\n   } else if (default_to_setget) {\n     return wb_setAttribute.call(this, attr, val);\n   }\n }\n var getter = function() {\n      var res = undefined;\n     if (orig_getter) {\n       res = orig_getter.call(this);\n    } else if (default_to_setget) {\n     res = wb_getAttribute.call(this, attr);\n   }\n   res = extract_orig(res);\n      return res;\n    }\n def_prop(obj, attr, setter, getter);"
+    ],
+    "lineNumber": 27,
+    "params": [
+      {
+        "name": "obj",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "attr",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "mod",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "default_to_setget",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 2,
+    "kind": "function",
+    "name": "init_loc_override",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~init_loc_override",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "more fun times for url rewriting\n{@link make_parser}\n{@link def_prop}",
+    "lineNumber": 37,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "loc_obj",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "orig_setter",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "orig_getter",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 3,
+    "kind": "function",
+    "name": "override_html_assign",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~override_html_assign",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "",
+    "examples": [
+      "if (!$wbwindow.DOMParser ||\n  !elemtype ||\n  !elemtype.prototype) {\n  return;\n}\n\nvar obj = elemtype.prototype;\n\nvar orig_getter = get_orig_getter(obj, prop);\nvar orig_setter = get_orig_setter(obj, prop);\n\nif (!orig_setter) {\n  return;\n}\n\nvar setter = function(orig) {\n  var res = orig;\n  if (!this._no_rewrite) {\n    //init_iframe_insert_obs(this);\n    if (this.tagName == \"STYLE\") {\n      res = rewrite_style(orig);\n    } else {\n      res = rewrite_html(orig);\n    }\n  }\n  orig_setter.call(this, res);\n}\n\ndef_prop(obj, prop, setter, orig_getter);"
+    ],
+    "lineNumber": 71,
+    "params": [
+      {
+        "name": "elemtype",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "prop",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 4,
+    "kind": "function",
+    "name": "rewrite_attr",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~rewrite_attr",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "rewrite urls of the elements",
+    "lineNumber": 79,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "elem",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "abs_url_only",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 5,
+    "kind": "function",
+    "name": "rewrite_elem",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~rewrite_elem",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "{@link rewrite_attr}",
+    "examples": [
+      "if (!elem) {\n  return;\n}\n\nvar changed;\n\nif (elem.tagName == \"STYLE\") {\n  var new_content = rewrite_style(elem.textContent);\n  if (elem.textContent != new_content) {\n    elem.textContent = new_content;\n    changed = true;\n  }\n} else if (elem.tagName == \"OBJECT\") {\n  changed = rewrite_attr(elem, \"data\", true);\n} else if (elem.tagName == \"FORM\") {\n  changed = rewrite_attr(elem, \"action\", true);\n} else if (elem.tagName == \"INPUT\") {\n  changed = rewrite_attr(elem, \"value\", true);\n} else if (elem.tagName == \"IFRAME\" || elem.tagName == \"FRAME\") {\n  changed = rewrite_frame_src(elem, \"src\");\n} else {\n  changed = rewrite_attr(elem, \"src\");\n  changed = rewrite_attr(elem, \"srcset\") || changed;\n  changed = rewrite_attr(elem, \"href\") || changed;\n  changed = rewrite_attr(elem, \"style\") || changed;\n  changed = rewrite_attr(elem, \"poster\") || changed;\n}\n\nif (elem.getAttribute) {\n  if (elem.getAttribute(\"crossorigin\")) {\n    elem.removeAttribute(\"crossorigin\");\n    changed = true;\n  }\n\n  if (elem.getAttribute(\"integrity\")) {\n    elem.removeAttribute(\"integrity\");\n    changed = true;\n  }\n}\n\nreturn changed;"
+    ],
+    "lineNumber": 128,
+    "params": [
+      {
+        "name": "elem",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 6,
+    "kind": "function",
+    "name": "rewrite_html",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~rewrite_html",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "{@link rewrite_elem}",
+    "examples": [
+      "if (!string) {\n  return string;\n}\n\nif (write_buff) {\n  string = write_buff + string;\n  write_buff = \"\";\n}\nvar inner_doc = new DOMParser().parseFromString(string, \"text/html\");\n\nif (!inner_doc) {\n  return string;\n}\n\nstring = string.toString();\n\nvar changed = false;\n\nfor (var i = 0; i < inner_doc.all.length; i++) {\n  changed = rewrite_elem(inner_doc.all[i]) || changed;\n}\n\nif (!changed) {\n  return string;\n}\n\nvar new_html = \"\";\n\n// if original had <html> tag, add full document HTML\nif (string && string.indexOf(\"<html\") >= 0) {\n  new_html = inner_doc.documentElement.outerHTML;\n} else {\n  // otherwise, just add contents of head and body\n  new_html = inner_doc.head.innerHTML;\n  new_html += inner_doc.body.innerHTML;\n\n  if (check_end_tag) {\n    if (inner_doc.all.length > 3) {\n      var end_tag = \"</\" + inner_doc.all[3].tagName.toLowerCase() + \">\";\n      if (ends_with(new_html, end_tag) && !ends_with(string, end_tag)) {\n        new_html = new_html.substring(0, new_html.length - end_tag.length);\n      }\n    } else if (string[0] != \"<\" || string[string.length - 1] != \">\") {\n      write_buff += string;\n      return;\n    }\n  }\n}\n\nreturn new_html;"
+    ],
+    "lineNumber": 185,
+    "params": [
+      {
+        "name": "string",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "check_end_tag",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 7,
+    "kind": "function",
+    "name": "init_new_window_wombat",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~init_new_window_wombat",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "",
+    "examples": [
+      "//imp\nif (!src || src == \"\" || src == \"about:blank\" || src.indexOf(\"javascript:\") >= 0) {\n  win._WBWombat = wombat_internal(win);\n  win._wb_wombat = new win._WBWombat(wb_info);\n} else {\n  // These should get overriden when content is loaded, but just in case...\n  //win._WB_wombat_location = win.location;\n  //win.document.WB_wombat_location = win.document.location;\n  //win._WB_wombat_top = $wbwindow.WB_wombat_top;\n\n  init_proto_pm_origin(win);\n  //init_postmessage_override(win);\n}"
+    ],
+    "lineNumber": 206,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "win",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "src",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 8,
+    "kind": "function",
+    "name": "init_iframe_wombat",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~init_iframe_wombat",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": " setup iframe for either captured pages or replay iframe\n{@link init_new_window_wombat}",
+    "examples": [
+      "// imp\nvar win;\n\nif (iframe._get_contentWindow) {\n   win = iframe._get_contentWindow.call(iframe);\n } else {\n   win = iframe.contentWindow;\n }\n\ntry {\n   if (!win || win == $wbwindow || win._skip_wombat || win._wb_wombat) {\n     return;\n   }\n } catch (e) {\n  return;\n}\n\n//var src = iframe.src;\nvar src = wb_getAttribute.call(iframe, \"src\");\n\ninit_new_window_wombat(win, src);"
+    ],
+    "lineNumber": 235,
+    "params": [
+      {
+        "name": "iframe",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 9,
+    "kind": "function",
+    "name": "replace_dom_func",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~replace_dom_func",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "replace dom function with own\n{@link init_iframe_wombat}",
+    "examples": [
+      "//imp\nvar orig = $wbwindow.Node.prototype[funcname];\n\n$wbwindow.Node.prototype[funcname] = function() {\n  var child = arguments[0];\n\n  if (child) {\n\n    if (child instanceof $wbwindow.Element) {\n      rewrite_elem(child);\n    } else if (child instanceof $wbwindow.Text) {\n      if (this.tagName == \"STYLE\") {\n        child.textContent = rewrite_style(child.textContent);\n      }\n    }\n\n    // if fragment, rewrite children before adding\n    //if (child instanceof DocumentFragment) {\n    //   rewrite_children(child);\n    //}\n  }\n\n  var created = orig.apply(this, arguments);\n\n  if (created && created.tagName == \"IFRAME\") {\n    init_iframe_wombat(created);\n  }\n\n  return created;\n}"
+    ],
+    "lineNumber": 274,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "funcname",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 10,
+    "kind": "function",
+    "name": "extract_orig",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~extract_orig",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "if proxy mode no extraction\nelse if href contains ignored prefixes [\"#\", \"about:\", \"data:\", \"mailto:\", \"javascript:\", \"{\", \"*\"] ignore\nelse remove wb url part and return original",
+    "lineNumber": 284,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "href",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "original href"
+    }
+  },
+  {
+    "__docId__": 11,
+    "kind": "function",
+    "name": "init_form_overrides",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~init_form_overrides",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "{@link override_attr}",
+    "examples": [
+      "var do_init_forms = function() {\n  for (var i = 0; i < $wbwindow.document.forms.length; i++) {\n    var new_action = rewrite_url($wbwindow.document.forms[i].action);\n    if (new_action != $wbwindow.document.forms[i].action) {\n      $wbwindow.document.forms[i].action = new_action;\n    }\n    override_attr($wbwindow.document.forms[i], \"action\", \"\", true);\n  }\n}\n\nif (document.readyState == \"loading\") {\n  document.addEventListener(\"DOMContentLoaded\", do_init_forms);\n} else {\n  do_init_forms();\n}"
+    ],
+    "lineNumber": 305,
+    "params": [
+      {
+        "name": "$wbwindow",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 12,
+    "kind": "function",
+    "name": "make_parser",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~make_parser",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": " create an a tag in top frame(not replay iframe)\n and use the tag to parse href after {@link extract_orig}\n special case: for newly opened blank windows, use the opener\n    to create parser to have the proper baseURI",
+    "lineNumber": 316,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Element}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "href",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Element"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 13,
+    "kind": "function",
+    "name": "is_host_url",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~is_host_url",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "",
+    "examples": [
+      "str.indexOf(\"www.\") == 0 -> true",
+      "// hostname:port (port required)\nstr.match(/^[\\w-]+(\\.[\\w-_]+)+(:\\d+)(\\/|$)/) and match len < 64 -> true",
+      "// ip:port\nstr.match(/^\\d+\\.\\d+\\.\\d+\\.\\d+(:\\d+)?(\\/|$)/) and match len < 64 -> true"
+    ],
+    "lineNumber": 333,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{boolean} if is host url"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "str",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": "if is host url"
+    }
+  },
+  {
+    "__docId__": 14,
+    "kind": "function",
+    "name": "def_prop",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~def_prop",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "Override a DOM property",
+    "lineNumber": 344,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "obj",
+        "description": "the object to define custom prop of"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "prop",
+        "description": "the prop to be overridden"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "set_func",
+        "description": "own setter function"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "get_func",
+        "description": "own getter function"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "boolean"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "enumerable",
+        "description": "is enumerable"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean",
+        "undefined"
+      ],
+      "spread": false,
+      "description": "if override was successful or not"
+    }
+  },
+  {
+    "__docId__": 15,
+    "kind": "function",
+    "name": "fetch",
+    "memberof": "toDoc/wombat.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "toDoc/wombat.js~fetch",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "override window.fetch\nrewrite url and call original",
+    "lineNumber": 352,
+    "params": [
+      {
+        "name": "input",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "init",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 16,
+    "kind": "class",
+    "name": "WombatLocation",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~WombatLocation",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 354,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 17,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#constructor",
+    "access": null,
+    "description": "override the win.location",
+    "lineNumber": 360,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "WombatLocation.init_loc_override"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "orig_loc",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 18,
+    "kind": "method",
+    "name": "init_loc_override",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#init_loc_override",
+    "access": null,
+    "description": "override getters and setters for\n[\"href\", \"hash\", \"pathname\", \"host\", \"hostname\", \"protocol\", \"origin\", \"search\", \"port\"]",
+    "lineNumber": 369,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "WombatLocation.make_get_loc_prop"
+      },
+      {
+        "tagName": "@link",
+        "tagValue": "WombatLocation.make_set_loc_prop"
+      }
+    ],
+    "params": [
+      {
+        "name": "loc_obj",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "orig_setter",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "orig_getter",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 19,
+    "kind": "method",
+    "name": "make_get_loc_prop",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#make_get_loc_prop",
+    "access": null,
+    "description": "call original if no rewrite else\n\ncall original and if prop is href return extract origin\nif self.original_href != the current href set_loc to new href\nelse value = this[\"_\" + prop] return value;",
+    "lineNumber": 381,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "prop",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 20,
+    "kind": "method",
+    "name": "make_set_loc_prop",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#make_set_loc_prop",
+    "access": null,
+    "description": "call original if no rewrite else\nthis[\"_\" + prop] = value;\nget original value\nif self.original_href != the current href set_loc to new href\nelse\nvalue = this[\"_\" + prop] return value;\ncheck for Special case for href=\".\" assignment\nrewrite and update globals if changes actual location and call original setter",
+    "lineNumber": 395,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "prop",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 21,
+    "kind": "method",
+    "name": "replace",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#replace",
+    "access": null,
+    "description": "",
+    "examples": [
+      "// the imp\nvar new_url = rewrite_url(url);\n var orig = extract_orig(new_url);\nif (orig == this.href) {\n      return orig;\n}\nreturn this._orig_loc.replace(new_url);"
+    ],
+    "lineNumber": 408,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "url",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 22,
+    "kind": "method",
+    "name": "assign",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#assign",
+    "access": null,
+    "description": "",
+    "examples": [
+      "// the imp\nvar new_url = rewrite_url(url);\nvar orig = extract_orig(new_url);\nif (orig == this.href) {\n      return orig;\n}\nreturn this._orig_loc.assign(new_url);"
+    ],
+    "lineNumber": 421,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "url",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 23,
+    "kind": "method",
+    "name": "reload",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#reload",
+    "access": null,
+    "description": null,
+    "lineNumber": 423,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 24,
+    "kind": "method",
+    "name": "orig_getter",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#orig_getter",
+    "access": null,
+    "description": "get a prop from original window.loc",
+    "lineNumber": 429,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "prop",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 25,
+    "kind": "method",
+    "name": "orig_setter",
+    "memberof": "toDoc/wombat.js~WombatLocation",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~WombatLocation#orig_setter",
+    "access": null,
+    "description": "set a prop from original window.loc",
+    "lineNumber": 435,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "prop",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 26,
+    "kind": "class",
+    "name": "Math",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~Math",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 438,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 27,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "toDoc/wombat.js~Math",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Math#constructor",
+    "access": null,
+    "description": null,
+    "lineNumber": 439,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 28,
+    "kind": "member",
+    "name": "seed",
+    "memberof": "toDoc/wombat.js~Math",
+    "static": false,
+    "longname": "toDoc/wombat.js~Math#seed",
+    "access": null,
+    "description": "pywb determined number",
+    "lineNumber": 444,
+    "type": {
+      "nullable": null,
+      "types": [
+        "number"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 29,
+    "kind": "method",
+    "name": "random",
+    "memberof": "toDoc/wombat.js~Math",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Math#random",
+    "access": null,
+    "description": "",
+    "lineNumber": 450,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "Math.seeded_random"
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 30,
+    "kind": "method",
+    "name": "seeded_random",
+    "memberof": "toDoc/wombat.js~Math",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Math#seeded_random",
+    "access": null,
+    "description": "",
+    "examples": [
+      "// imp\n $wbwindow.Math.seed = ($wbwindow.Math.seed * 9301 + 49297) % 233280;\n return $wbwindow.Math.seed / 233280;"
+    ],
+    "lineNumber": 458,
+    "params": []
+  },
+  {
+    "__docId__": 31,
+    "kind": "class",
+    "name": "Crypto",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~Crypto",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 461,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 32,
+    "kind": "method",
+    "name": "getRandomValues",
+    "memberof": "toDoc/wombat.js~Crypto",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Crypto#getRandomValues",
+    "access": null,
+    "description": "uses {@link Math.random}",
+    "lineNumber": 466,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "array",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 33,
+    "kind": "class",
+    "name": "History",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~History",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 469,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 34,
+    "kind": "method",
+    "name": "pushState",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#pushState",
+    "access": null,
+    "description": "",
+    "lineNumber": 473,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "History.override_history_func"
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 35,
+    "kind": "method",
+    "name": "replaceState",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#replaceState",
+    "access": null,
+    "description": "",
+    "lineNumber": 478,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "History.override_history_func"
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 36,
+    "kind": "method",
+    "name": "go",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#go",
+    "access": null,
+    "description": "",
+    "lineNumber": 483,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "History.override_history_nav"
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 37,
+    "kind": "method",
+    "name": "back",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#back",
+    "access": null,
+    "description": "",
+    "lineNumber": 488,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "History.override_history_nav"
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 38,
+    "kind": "method",
+    "name": "forward",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#forward",
+    "access": null,
+    "description": "",
+    "lineNumber": 493,
+    "unknown": [
+      {
+        "tagName": "@link",
+        "tagValue": "History.override_history_nav"
+      }
+    ],
+    "params": []
+  },
+  {
+    "__docId__": 39,
+    "kind": "method",
+    "name": "override_history_func",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#override_history_func",
+    "access": null,
+    "description": "rewrite url and house keeping with communication with top frame",
+    "lineNumber": 499,
+    "params": []
+  },
+  {
+    "__docId__": 40,
+    "kind": "method",
+    "name": "override_history_nav",
+    "memberof": "toDoc/wombat.js~History",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~History#override_history_nav",
+    "access": null,
+    "description": "rewrite url and house keeping with communication with top frame\nminute diff with other method",
+    "lineNumber": 506,
+    "params": []
+  },
+  {
+    "__docId__": 41,
+    "kind": "class",
+    "name": "XMLHttpRequest",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~XMLHttpRequest",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 510,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 42,
+    "kind": "method",
+    "name": "open",
+    "memberof": "toDoc/wombat.js~XMLHttpRequest",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~XMLHttpRequest#open",
+    "access": null,
+    "description": "rewrite url if rewrite enabled\ncall original check if url starts with data:\nif does set 'X-Pywb-Requested-With', 'XMLHttpRequest'",
+    "lineNumber": 517,
+    "params": [
+      {
+        "name": "method",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "async",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "user",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "password",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 43,
+    "kind": "class",
+    "name": "HTMLBaseElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLBaseElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 520,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 44,
+    "kind": "method",
+    "name": "getAttribute",
+    "memberof": "toDoc/wombat.js~HTMLBaseElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLBaseElement#getAttribute",
+    "access": null,
+    "description": "call original and if name name is href rewrite",
+    "lineNumber": 526,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 45,
+    "kind": "get",
+    "name": "href",
+    "memberof": "toDoc/wombat.js~HTMLBaseElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLBaseElement#href",
+    "access": null,
+    "description": "call {@link HTMLBaseElement.getAttribute}\n{@link def_prop}",
+    "lineNumber": 532
+  },
+  {
+    "__docId__": 46,
+    "kind": "class",
+    "name": "Node",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~Node",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 535,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 47,
+    "kind": "get",
+    "name": "baseURI",
+    "memberof": "toDoc/wombat.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Node#baseURI",
+    "access": null,
+    "description": "returns the absolute base URL of a node\noverride it with own getter who call original and {@link extract_orig}\n{@link def_prop}",
+    "lineNumber": 541
+  },
+  {
+    "__docId__": 48,
+    "kind": "method",
+    "name": "appendChild",
+    "memberof": "toDoc/wombat.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Node#appendChild",
+    "access": null,
+    "description": "{@link replace_dom_func}",
+    "lineNumber": 547,
+    "params": []
+  },
+  {
+    "__docId__": 49,
+    "kind": "method",
+    "name": "inertBefore",
+    "memberof": "toDoc/wombat.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Node#inertBefore",
+    "access": null,
+    "description": "{@link replace_dom_func}",
+    "lineNumber": 553,
+    "params": []
+  },
+  {
+    "__docId__": 50,
+    "kind": "method",
+    "name": "replaceChild",
+    "memberof": "toDoc/wombat.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Node#replaceChild",
+    "access": null,
+    "description": "{@link replace_dom_func}",
+    "lineNumber": 559,
+    "params": []
+  },
+  {
+    "__docId__": 51,
+    "kind": "class",
+    "name": "Element",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~Element",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 562,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 52,
+    "kind": "method",
+    "name": "setAttribute",
+    "memberof": "toDoc/wombat.js~Element",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Element#setAttribute",
+    "access": null,
+    "description": "rewrite [\"src\", \"href\", \"poster\"] attributes\nif script then add js_ to url\nif style and if value is string rewrite value urls\ncall original",
+    "see": [
+      "https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute"
+    ],
+    "lineNumber": 571,
+    "params": []
+  },
+  {
+    "__docId__": 53,
+    "kind": "method",
+    "name": "getAttribute",
+    "memberof": "toDoc/wombat.js~Element",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Element#getAttribute",
+    "access": null,
+    "description": "call original\nif [\"src\", \"href\", \"poster\"] attributes\nor attributes who start with data- or http://, https://, //\nextract origin from original call results\nreturn value",
+    "lineNumber": 581,
+    "params": []
+  },
+  {
+    "__docId__": 54,
+    "kind": "class",
+    "name": "HTMLElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 584,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 55,
+    "kind": "get",
+    "name": "innerHTML",
+    "memberof": "toDoc/wombat.js~HTMLElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLElement#innerHTML",
+    "access": null,
+    "description": "{@link override_html_assign}",
+    "lineNumber": 588
+  },
+  {
+    "__docId__": 56,
+    "kind": "class",
+    "name": "document",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~document",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 591,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 57,
+    "kind": "method",
+    "name": "createElement",
+    "memberof": "toDoc/wombat.js~document",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~document#createElement",
+    "access": null,
+    "description": "if form override action {@link override_attr}\nif no rewrite add _no_rewrite = true to object property\nreturn new element",
+    "lineNumber": 598,
+    "params": []
+  },
+  {
+    "__docId__": 58,
+    "kind": "method",
+    "name": "createElementNS",
+    "memberof": "toDoc/wombat.js~document",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~document#createElementNS",
+    "access": null,
+    "description": "Creates an element with the specified namespace URI and qualified name\nextract origin {@link extract_orig} from namespaceURI call\nreturn call to original method using extracted origin",
+    "see": [
+      "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS"
+    ],
+    "lineNumber": 607,
+    "params": []
+  },
+  {
+    "__docId__": 59,
+    "kind": "method",
+    "name": "write",
+    "memberof": "toDoc/wombat.js~document",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~document#write",
+    "access": null,
+    "description": "{@link rewrite_html}",
+    "lineNumber": 613,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "string",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 60,
+    "kind": "method",
+    "name": "writeln",
+    "memberof": "toDoc/wombat.js~document",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~document#writeln",
+    "access": null,
+    "description": "{@link rewrite_html}",
+    "lineNumber": 619,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "string",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 61,
+    "kind": "class",
+    "name": "Date",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~Date",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 622,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 62,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "toDoc/wombat.js~Date",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Date#constructor",
+    "access": null,
+    "description": "Override to create Date object using time of capture",
+    "lineNumber": 627,
+    "params": []
+  },
+  {
+    "__docId__": 63,
+    "kind": "method",
+    "name": "UTC",
+    "memberof": "toDoc/wombat.js~Date",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Date#UTC",
+    "access": null,
+    "description": "Override to use original (not time of capture)",
+    "lineNumber": 633,
+    "params": []
+  },
+  {
+    "__docId__": 64,
+    "kind": "method",
+    "name": "parse",
+    "memberof": "toDoc/wombat.js~Date",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Date#parse",
+    "access": null,
+    "description": "Override to use original (not time of capture)",
+    "lineNumber": 639,
+    "params": []
+  },
+  {
+    "__docId__": 65,
+    "kind": "method",
+    "name": "now",
+    "memberof": "toDoc/wombat.js~Date",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~Date#now",
+    "access": null,
+    "description": "Override to time of capture",
+    "lineNumber": 645,
+    "params": []
+  },
+  {
+    "__docId__": 66,
+    "kind": "class",
+    "name": "Worker",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~Worker",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "Disabled",
+    "lineNumber": 652,
+    "interface": false
+  },
+  {
+    "__docId__": 67,
+    "kind": "class",
+    "name": "HTMLScriptElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLScriptElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 655,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 68,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLScriptElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLScriptElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 660
+  },
+  {
+    "__docId__": 69,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLScriptElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLScriptElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 666,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 70,
+    "kind": "class",
+    "name": "HTMLIFrameElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLIFrameElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 669,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 71,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLIFrameElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLIFrameElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 674
+  },
+  {
+    "__docId__": 72,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLIFrameElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLIFrameElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 680,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 73,
+    "kind": "class",
+    "name": "HTMLStyleElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLStyleElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 683,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 74,
+    "kind": "get",
+    "name": "textContent",
+    "memberof": "toDoc/wombat.js~HTMLStyleElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLStyleElement#textContent",
+    "access": null,
+    "description": "{@link override_html_assign}",
+    "lineNumber": 687
+  },
+  {
+    "__docId__": 75,
+    "kind": "set",
+    "name": "textContent",
+    "memberof": "toDoc/wombat.js~HTMLStyleElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLStyleElement#textContent",
+    "access": null,
+    "description": "{@link override_html_assign}",
+    "lineNumber": 692,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 76,
+    "kind": "class",
+    "name": "HTMLSourceElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLSourceElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 695,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 77,
+    "kind": "get",
+    "name": "srcset",
+    "memberof": "toDoc/wombat.js~HTMLSourceElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLSourceElement#srcset",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 700
+  },
+  {
+    "__docId__": 78,
+    "kind": "set",
+    "name": "srcset",
+    "memberof": "toDoc/wombat.js~HTMLSourceElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLSourceElement#srcset",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 706,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 79,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLSourceElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLSourceElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 712
+  },
+  {
+    "__docId__": 80,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLSourceElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLSourceElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 718,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 81,
+    "kind": "get",
+    "name": "insertAdjacentHTML",
+    "memberof": "toDoc/wombat.js~HTMLSourceElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLSourceElement#insertAdjacentHTML",
+    "access": null,
+    "description": "{@link rewrite_html}",
+    "lineNumber": 723
+  },
+  {
+    "__docId__": 82,
+    "kind": "set",
+    "name": "insertAdjacentHTML",
+    "memberof": "toDoc/wombat.js~HTMLSourceElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLSourceElement#insertAdjacentHTML",
+    "access": null,
+    "description": "{@link rewrite_html}",
+    "lineNumber": 728,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 83,
+    "kind": "class",
+    "name": "CSSStyleDeclaration",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 731,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 84,
+    "kind": "get",
+    "name": "listStyle",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyle",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 736
+  },
+  {
+    "__docId__": 85,
+    "kind": "set",
+    "name": "listStyle",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyle",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 742,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 86,
+    "kind": "get",
+    "name": "borderImage",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 748
+  },
+  {
+    "__docId__": 87,
+    "kind": "set",
+    "name": "borderImage",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 754,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 88,
+    "kind": "get",
+    "name": "backgroundImage",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#backgroundImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 760
+  },
+  {
+    "__docId__": 89,
+    "kind": "set",
+    "name": "backgroundImage",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#backgroundImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 766,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 90,
+    "kind": "get",
+    "name": "cssText",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#cssText",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 772
+  },
+  {
+    "__docId__": 91,
+    "kind": "set",
+    "name": "cssText",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#cssText",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 778,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "get",
+    "name": "listStyleImage",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyleImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 784
+  },
+  {
+    "__docId__": 93,
+    "kind": "set",
+    "name": "listStyleImage",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyleImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 790,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "get",
+    "name": "border",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#border",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 796
+  },
+  {
+    "__docId__": 95,
+    "kind": "set",
+    "name": "border",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#border",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 802,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "get",
+    "name": "borderImageSource",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImageSource",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 808
+  },
+  {
+    "__docId__": 97,
+    "kind": "set",
+    "name": "borderImageSource",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImageSource",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 814,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 98,
+    "kind": "get",
+    "name": "background",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#background",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 820
+  },
+  {
+    "__docId__": 99,
+    "kind": "set",
+    "name": "background",
+    "memberof": "toDoc/wombat.js~CSSStyleDeclaration",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleDeclaration#background",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 826,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 100,
+    "kind": "class",
+    "name": "HTMLEmbedElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLEmbedElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 829,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 101,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLEmbedElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLEmbedElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 834
+  },
+  {
+    "__docId__": 102,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLEmbedElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLEmbedElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 840,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 103,
+    "kind": "class",
+    "name": "HTMLImageElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLImageElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 843,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 104,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLImageElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLImageElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 848
+  },
+  {
+    "__docId__": 105,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLImageElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLImageElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 854,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 106,
+    "kind": "class",
+    "name": "HTMLVideoElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLVideoElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 857,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 107,
+    "kind": "get",
+    "name": "poster",
+    "memberof": "toDoc/wombat.js~HTMLVideoElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLVideoElement#poster",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 862
+  },
+  {
+    "__docId__": 108,
+    "kind": "set",
+    "name": "poster",
+    "memberof": "toDoc/wombat.js~HTMLVideoElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLVideoElement#poster",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 868,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 109,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLVideoElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLVideoElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 874
+  },
+  {
+    "__docId__": 110,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLVideoElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLVideoElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 880,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 111,
+    "kind": "class",
+    "name": "CSSStyleSheet",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~CSSStyleSheet",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 883,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 112,
+    "kind": "get",
+    "name": "href",
+    "memberof": "toDoc/wombat.js~CSSStyleSheet",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleSheet#href",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 888
+  },
+  {
+    "__docId__": 113,
+    "kind": "set",
+    "name": "href",
+    "memberof": "toDoc/wombat.js~CSSStyleSheet",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSSStyleSheet#href",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 894,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 114,
+    "kind": "class",
+    "name": "HTMLObjectElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLObjectElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 897,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 115,
+    "kind": "get",
+    "name": "data",
+    "memberof": "toDoc/wombat.js~HTMLObjectElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLObjectElement#data",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 902
+  },
+  {
+    "__docId__": 116,
+    "kind": "set",
+    "name": "data",
+    "memberof": "toDoc/wombat.js~HTMLObjectElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLObjectElement#data",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 908,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 117,
+    "kind": "class",
+    "name": "HTMLAudioElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLAudioElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 911,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 118,
+    "kind": "get",
+    "name": "poster",
+    "memberof": "toDoc/wombat.js~HTMLAudioElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLAudioElement#poster",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 916
+  },
+  {
+    "__docId__": 119,
+    "kind": "set",
+    "name": "poster",
+    "memberof": "toDoc/wombat.js~HTMLAudioElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLAudioElement#poster",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 922,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 120,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLAudioElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLAudioElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 928
+  },
+  {
+    "__docId__": 121,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLAudioElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLAudioElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 934,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 122,
+    "kind": "class",
+    "name": "CSS2Properties",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~CSS2Properties",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 937,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 123,
+    "kind": "get",
+    "name": "listStyle",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#listStyle",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 942
+  },
+  {
+    "__docId__": 124,
+    "kind": "set",
+    "name": "listStyle",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#listStyle",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 948,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 125,
+    "kind": "get",
+    "name": "borderImage",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#borderImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 954
+  },
+  {
+    "__docId__": 126,
+    "kind": "set",
+    "name": "borderImage",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#borderImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 960,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 127,
+    "kind": "get",
+    "name": "backgroundImage",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#backgroundImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 966
+  },
+  {
+    "__docId__": 128,
+    "kind": "set",
+    "name": "backgroundImage",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#backgroundImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 972,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 129,
+    "kind": "get",
+    "name": "cssText",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#cssText",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 978
+  },
+  {
+    "__docId__": 130,
+    "kind": "set",
+    "name": "cssText",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#cssText",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 984,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 131,
+    "kind": "get",
+    "name": "listStyleImage",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#listStyleImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 990
+  },
+  {
+    "__docId__": 132,
+    "kind": "set",
+    "name": "listStyleImage",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#listStyleImage",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 996,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 133,
+    "kind": "get",
+    "name": "border",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#border",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1002
+  },
+  {
+    "__docId__": 134,
+    "kind": "set",
+    "name": "border",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#border",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1008,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 135,
+    "kind": "get",
+    "name": "borderImageSource",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#borderImageSource",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1014
+  },
+  {
+    "__docId__": 136,
+    "kind": "set",
+    "name": "borderImageSource",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#borderImageSource",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1020,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 137,
+    "kind": "get",
+    "name": "background",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#background",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1026
+  },
+  {
+    "__docId__": 138,
+    "kind": "set",
+    "name": "background",
+    "memberof": "toDoc/wombat.js~CSS2Properties",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~CSS2Properties#background",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1032,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 139,
+    "kind": "class",
+    "name": "HTMLInputElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLInputElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1035,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 140,
+    "kind": "get",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLInputElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLInputElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1040
+  },
+  {
+    "__docId__": 141,
+    "kind": "set",
+    "name": "src",
+    "memberof": "toDoc/wombat.js~HTMLInputElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLInputElement#src",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1046,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 142,
+    "kind": "class",
+    "name": "HTMLLinkElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLLinkElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1049,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 143,
+    "kind": "get",
+    "name": "href",
+    "memberof": "toDoc/wombat.js~HTMLLinkElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLLinkElement#href",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1054
+  },
+  {
+    "__docId__": 144,
+    "kind": "set",
+    "name": "href",
+    "memberof": "toDoc/wombat.js~HTMLLinkElement",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "toDoc/wombat.js~HTMLLinkElement#href",
+    "access": null,
+    "description": "see {@link override_attr}",
+    "lineNumber": 1060,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 145,
+    "kind": "class",
+    "name": "HTMLAnchorElement",
+    "memberof": "toDoc/wombat.js",
+    "static": true,
+    "longname": "toDoc/wombat.js~HTMLAnchorElement",
+    "access": null,
+    "export": false,
+    "importPath": "archive_page_mods/toDoc/wombat.js",
+    "importStyle": null,
+    "description": "keep a copy of the original element get/set properties in back pocket\n{@link init_loc_override}",
+    "lineNumber": 1069,
+    "interface": false
+  },
+  {
+    "__docId__": 147,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Infinity",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 148,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~NaN",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 149,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~undefined",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 150,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~null",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 151,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 152,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 153,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 154,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 155,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 156,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 157,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Symbol",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 158,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Error",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 159,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~EvalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 160,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~InternalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 161,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RangeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 162,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ReferenceError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 163,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~SyntaxError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 164,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~TypeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 165,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~URIError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 166,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 167,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 168,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Date",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 169,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~String",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 170,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~string",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 171,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RegExp",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 172,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 173,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 174,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 175,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8ClampedArray",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 176,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 177,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 178,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 179,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 180,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 181,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float64Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 182,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Map",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 183,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Set",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 184,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakMap",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 185,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakSet",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 186,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ArrayBuffer",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 187,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~DataView",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 188,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~JSON",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 189,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Promise",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 190,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Generator",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 191,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~GeneratorFunction",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 192,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Reflect",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 193,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Proxy",
+    "access": null,
+    "description": "",
+    "lineNumber": 193,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 195,
+    "kind": "external",
+    "name": "CanvasRenderingContext2D",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~CanvasRenderingContext2D",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 196,
+    "kind": "external",
+    "name": "DocumentFragment",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~DocumentFragment",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 197,
+    "kind": "external",
+    "name": "Element",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Element",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 198,
+    "kind": "external",
+    "name": "Event",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Event",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Event",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 199,
+    "kind": "external",
+    "name": "Node",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Node",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 200,
+    "kind": "external",
+    "name": "NodeList",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/NodeList",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~NodeList",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 201,
+    "kind": "external",
+    "name": "XMLHttpRequest",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 202,
+    "kind": "external",
+    "name": "AudioContext",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/AudioContext",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~AudioContext",
+    "access": null,
+    "description": "",
+    "lineNumber": 34,
+    "builtinExternal": true
+  }
+]
