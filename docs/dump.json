@@ -3,7 +3,7 @@
     "__docId__": 0,
     "kind": "file",
     "name": "toDoc/wombat.js",
-    "content": "/**\n * @desc\n * Override attribute using getters and setters\n * @example\n * var orig_getter = get_orig_getter(obj, attr);\n * var orig_setter = get_orig_setter(obj, attr);\n *  var setter = function(orig) {\n *    var val = rewrite_url(orig, false, mod);\n *    if (orig_setter) {\n *      return orig_setter.call(this, val);\n *    } else if (default_to_setget) {\n *      return wb_setAttribute.call(this, attr, val);\n *    }\n *  }\n *  var getter = function() {\n *       var res = undefined;\n *      if (orig_getter) {\n *        res = orig_getter.call(this);\n *     } else if (default_to_setget) {\n *      res = wb_getAttribute.call(this, attr);\n *    }\n *    res = extract_orig(res);\n *       return res;\n *     }\n *  def_prop(obj, attr, setter, getter);\n */\nfunction override_attr (obj, attr, mod, default_to_setget) {}\n\n/**\n * @desc more fun times for url rewriting\n * {@link make_parser}\n * {@link def_prop}\n * @param loc_obj\n * @param orig_setter\n * @param orig_getter\n */\nfunction init_loc_override(loc_obj, orig_setter, orig_getter) {}\n\n/**\n* @example\n* if (!$wbwindow.DOMParser ||\n*   !elemtype ||\n*   !elemtype.prototype) {\n*   return;\n* }\n*\n* var obj = elemtype.prototype;\n*\n* var orig_getter = get_orig_getter(obj, prop);\n* var orig_setter = get_orig_setter(obj, prop);\n*\n* if (!orig_setter) {\n*   return;\n* }\n*\n* var setter = function(orig) {\n*   var res = orig;\n*   if (!this._no_rewrite) {\n*     //init_iframe_insert_obs(this);\n*     if (this.tagName == \"STYLE\") {\n*       res = rewrite_style(orig);\n*     } else {\n*       res = rewrite_html(orig);\n*     }\n*   }\n*   orig_setter.call(this, res);\n* }\n*\n* def_prop(obj, prop, setter, orig_getter);\n*/\nfunction override_html_assign(elemtype, prop) {}\n\n/**\n * @desc rewrite urls of the elements\n * @param elem\n * @param name\n * @param abs_url_only\n */\nfunction rewrite_attr(elem, name, abs_url_only) {}\n\n/**\n * @desc\n * {@link rewrite_attr}\n * @example\n * if (!elem) {\n *   return;\n * }\n *\n * var changed;\n *\n * if (elem.tagName == \"STYLE\") {\n *   var new_content = rewrite_style(elem.textContent);\n *   if (elem.textContent != new_content) {\n *     elem.textContent = new_content;\n *     changed = true;\n *   }\n * } else if (elem.tagName == \"OBJECT\") {\n *   changed = rewrite_attr(elem, \"data\", true);\n * } else if (elem.tagName == \"FORM\") {\n *   changed = rewrite_attr(elem, \"action\", true);\n * } else if (elem.tagName == \"INPUT\") {\n *   changed = rewrite_attr(elem, \"value\", true);\n * } else if (elem.tagName == \"IFRAME\" || elem.tagName == \"FRAME\") {\n *   changed = rewrite_frame_src(elem, \"src\");\n * } else {\n *   changed = rewrite_attr(elem, \"src\");\n *   changed = rewrite_attr(elem, \"srcset\") || changed;\n *   changed = rewrite_attr(elem, \"href\") || changed;\n *   changed = rewrite_attr(elem, \"style\") || changed;\n *   changed = rewrite_attr(elem, \"poster\") || changed;\n * }\n *\n * if (elem.getAttribute) {\n *   if (elem.getAttribute(\"crossorigin\")) {\n *     elem.removeAttribute(\"crossorigin\");\n *     changed = true;\n *   }\n *\n *   if (elem.getAttribute(\"integrity\")) {\n *     elem.removeAttribute(\"integrity\");\n *     changed = true;\n *   }\n * }\n *\n * return changed;\n *\n */\nfunction rewrite_elem (elem) {}\n\n/**\n * @desc\n * {@link rewrite_elem}\n * @example\n * if (!string) {\n *   return string;\n * }\n *\n * if (write_buff) {\n *   string = write_buff + string;\n *   write_buff = \"\";\n * }\n * var inner_doc = new DOMParser().parseFromString(string, \"text/html\");\n *\n * if (!inner_doc) {\n *   return string;\n * }\n *\n * string = string.toString();\n *\n * var changed = false;\n *\n * for (var i = 0; i < inner_doc.all.length; i++) {\n *   changed = rewrite_elem(inner_doc.all[i]) || changed;\n * }\n *\n * if (!changed) {\n *   return string;\n * }\n *\n * var new_html = \"\";\n *\n * // if original had <html> tag, add full document HTML\n * if (string && string.indexOf(\"<html\") >= 0) {\n *   new_html = inner_doc.documentElement.outerHTML;\n * } else {\n *   // otherwise, just add contents of head and body\n *   new_html = inner_doc.head.innerHTML;\n *   new_html += inner_doc.body.innerHTML;\n *\n *   if (check_end_tag) {\n *     if (inner_doc.all.length > 3) {\n *       var end_tag = \"</\" + inner_doc.all[3].tagName.toLowerCase() + \">\";\n *       if (ends_with(new_html, end_tag) && !ends_with(string, end_tag)) {\n *         new_html = new_html.substring(0, new_html.length - end_tag.length);\n *       }\n *     } else if (string[0] != \"<\" || string[string.length - 1] != \">\") {\n *       write_buff += string;\n *       return;\n *     }\n *   }\n * }\n *\n * return new_html;\n */\nfunction rewrite_html (string, check_end_tag) {}\n\n/**\n * @example\n * //imp\n * if (!src || src == \"\" || src == \"about:blank\" || src.indexOf(\"javascript:\") >= 0) {\n *   win._WBWombat = wombat_internal(win);\n *   win._wb_wombat = new win._WBWombat(wb_info);\n * } else {\n *   // These should get overriden when content is loaded, but just in case...\n *   //win._WB_wombat_location = win.location;\n *   //win.document.WB_wombat_location = win.document.location;\n *   //win._WB_wombat_top = $wbwindow.WB_wombat_top;\n *\n *   init_proto_pm_origin(win);\n *   //init_postmessage_override(win);\n * }\n *\n * @param win\n * @param src\n */\nfunction init_new_window_wombat (win, src) {}\n\n/**\n * @desc\n *  setup iframe for either captured pages or replay iframe\n * {@link init_new_window_wombat}\n * @example\n * // imp\n * var win;\n *\n * if (iframe._get_contentWindow) {\n *    win = iframe._get_contentWindow.call(iframe);\n *  } else {\n *    win = iframe.contentWindow;\n *  }\n *\n * try {\n *    if (!win || win == $wbwindow || win._skip_wombat || win._wb_wombat) {\n *      return;\n *    }\n *  } catch (e) {\n *   return;\n * }\n *\n * //var src = iframe.src;\n * var src = wb_getAttribute.call(iframe, \"src\");\n *\n * init_new_window_wombat(win, src);\n */\nfunction init_iframe_wombat (iframe) {}\n\n/**\n * @desc\n * replace dom function with own\n * {@link init_iframe_wombat}\n * @example\n * //imp\n * var orig = $wbwindow.Node.prototype[funcname];\n *\n * $wbwindow.Node.prototype[funcname] = function() {\n *   var child = arguments[0];\n *\n *   if (child) {\n *\n *     if (child instanceof $wbwindow.Element) {\n *       rewrite_elem(child);\n *     } else if (child instanceof $wbwindow.Text) {\n *       if (this.tagName == \"STYLE\") {\n *         child.textContent = rewrite_style(child.textContent);\n *       }\n *     }\n *\n *     // if fragment, rewrite children before adding\n *     //if (child instanceof DocumentFragment) {\n *     //   rewrite_children(child);\n *     //}\n *   }\n *\n *   var created = orig.apply(this, arguments);\n *\n *   if (created && created.tagName == \"IFRAME\") {\n *     init_iframe_wombat(created);\n *   }\n *\n *   return created;\n * }\n * @param funcname\n */\nfunction replace_dom_func (funcname) {}\n\n/**\n * @desc\n * if proxy mode no extraction\n * else if href contains ignored prefixes [\"#\", \"about:\", \"data:\", \"mailto:\", \"javascript:\", \"{\", \"*\"] ignore\n * else remove wb url part and return original\n * @param href\n * @return {string} original href\n */\nfunction extract_orig (href) {}\n\n/**\n* {@link override_attr}\n* @example\n* var do_init_forms = function() {\n*   for (var i = 0; i < $wbwindow.document.forms.length; i++) {\n*     var new_action = rewrite_url($wbwindow.document.forms[i].action);\n*     if (new_action != $wbwindow.document.forms[i].action) {\n*       $wbwindow.document.forms[i].action = new_action;\n*     }\n*     override_attr($wbwindow.document.forms[i], \"action\", \"\", true);\n*   }\n* }\n*\n* if (document.readyState == \"loading\") {\n*   document.addEventListener(\"DOMContentLoaded\", do_init_forms);\n* } else {\n*   do_init_forms();\n* }\n*/\nfunction init_form_overrides($wbwindow) {}\n\n/**\n * @desc\n *  create an a tag in top frame(not replay iframe)\n *  and use the tag to parse href after {@link extract_orig}\n *  special case: for newly opened blank windows, use the opener\n *     to create parser to have the proper baseURI\n * @param href\n * @returns {Element}\n */\nfunction make_parser (href) {}\n\n/**\n * @example\n * str.indexOf(\"www.\") == 0 -> true\n *\n * @example\n * // hostname:port (port required)\n * str.match(/^[\\w-]+(\\.[\\w-_]+)+(:\\d+)(\\/|$)/) and match len < 64 -> true\n *\n * @example\n * // ip:port\n * str.match(/^\\d+\\.\\d+\\.\\d+\\.\\d+(:\\d+)?(\\/|$)/) and match len < 64 -> true\n *\n * @param {string} str\n * @returns {boolean} if is host url\n */\nfunction is_host_url (str) {}\n\n/**\n * @desc Override a DOM property\n * @param {Object} obj  the object to define custom prop of\n * @param {String} prop the prop to be overridden\n * @param {function} set_func own setter function\n * @param {function} get_func own getter function\n * @param {boolean} enumerable is enumerable\n * @return {boolean|undefined} if override was successful or not\n */\nfunction def_prop (obj, prop, set_func, get_func, enumerable) {}\n\n/**\n *\n * @desc\n * override window.fetch\n * rewrite url and call original\n */\nfunction fetch (input, init) {}\n\nclass WombatLocation {\n  /**\n   * @desc override the win.location\n   * @param {Object} orig_loc\n   * @link WombatLocation.init_loc_override\n   */\n  constructor (orig_loc) {}\n\n  /**\n   * @desc\n   * override getters and setters for\n   * [\"href\", \"hash\", \"pathname\", \"host\", \"hostname\", \"protocol\", \"origin\", \"search\", \"port\"]\n   * @link WombatLocation.make_get_loc_prop\n   * @link WombatLocation.make_set_loc_prop\n   */\n  init_loc_override (loc_obj, orig_setter, orig_getter) {}\n\n  /**\n   * @desc\n   * call original if no rewrite else\n   *\n   * call original and if prop is href return extract origin\n   * if self.original_href != the current href set_loc to new href\n   * else value = this[\"_\" + prop] return value;\n   *\n   * @param prop\n   */\n  make_get_loc_prop (prop) {}\n\n  /**\n   * @desc\n   * call original if no rewrite else\n   * this[\"_\" + prop] = value;\n   * get original value\n   * if self.original_href != the current href set_loc to new href\n   * else\n   * value = this[\"_\" + prop] return value;\n   * check for Special case for href=\".\" assignment\n   * rewrite and update globals if changes actual location and call original setter\n   * @param prop\n   */\n  make_set_loc_prop (prop) {}\n\n  /**\n   * @example\n   * // the imp\n   * var new_url = rewrite_url(url);\n   *  var orig = extract_orig(new_url);\n   * if (orig == this.href) {\n   *       return orig;\n   * }\n   * return this._orig_loc.replace(new_url);\n   * @param {string} url\n   */\n  replace (url) {}\n\n  /**\n   * @example\n   * // the imp\n   * var new_url = rewrite_url(url);\n   * var orig = extract_orig(new_url);\n   * if (orig == this.href) {\n   *       return orig;\n   * }\n   * return this._orig_loc.assign(new_url);\n   * @param {string} url\n   */\n  assign (url) {}\n\n  reload (url) {}\n\n  /**\n   * @desc get a prop from original window.loc\n   * @param prop\n   */\n  orig_getter (prop) {}\n\n  /**\n   * @desc set a prop from original window.loc\n   * @param prop\n   */\n  orig_setter (prop) {}\n}\n\nclass Math {\n  constructor () {\n    /**\n     * @desc pywb determined number\n     * @type {number}\n     */\n    this.seed = 123;\n  }\n\n  /**\n   * @link Math.seeded_random\n   */\n  random () {}\n\n  /**\n   * @example\n   * // imp\n   *  $wbwindow.Math.seed = ($wbwindow.Math.seed * 9301 + 49297) % 233280;\n   *  return $wbwindow.Math.seed / 233280;\n   */\n  seeded_random () {}\n}\n\nclass Crypto {\n  /**\n   * uses {@link Math.random}\n   * @param array\n   */\n  getRandomValues (array) {}\n}\n\nclass History {\n  /**\n   * @link History.override_history_func\n   */\n  pushState () {}\n\n  /**\n   * @link History.override_history_func\n   */\n  replaceState () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  go () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  back () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  forward () {}\n\n  /**\n   * @desc\n   * rewrite url and house keeping with communication with top frame\n   */\n  override_history_func () {}\n\n  /**\n   * @desc\n   * rewrite url and house keeping with communication with top frame\n   * minute diff with other method\n   */\n  override_history_nav () {}\n\n}\n\nclass XMLHttpRequest {\n  /**\n   * @desc\n   * rewrite url if rewrite enabled\n   * call original check if url starts with data:\n   * if does set 'X-Pywb-Requested-With', 'XMLHttpRequest'\n   */\n  open (method, url, async, user, password) {}\n}\n\nclass HTMLBaseElement {\n  /**\n   * @desc\n   * call original and if name name is href rewrite\n   * @param {string} name\n   */\n  getAttribute (name) {}\n\n  /**\n   * call {@link HTMLBaseElement.getAttribute}\n   * {@link def_prop}\n   */\n  get href () {}\n}\n\nclass Node {\n  /**\n   * @desc returns the absolute base URL of a node\n   * override it with own getter who call original and {@link extract_orig}\n   * {@link def_prop}\n   */\n  get baseURI () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  appendChild () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  inertBefore () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  replaceChild () {}\n}\n\nclass Element {\n  /**\n   * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute\n   * @desc\n   * rewrite [\"src\", \"href\", \"poster\"] attributes\n   * if script then add js_ to url\n   * if style and if value is string rewrite value urls\n   * call original\n   */\n  setAttribute () {}\n\n  /**\n   * @desc\n   * call original\n   * if [\"src\", \"href\", \"poster\"] attributes\n   * or attributes who start with data- or http://, https://, //\n   * extract origin from original call results\n   * return value\n   */\n  getAttribute () {}\n}\n\nclass HTMLElement {\n  /**\n   * {@link override_html_assign}\n   */\n  get innerHTML (){}\n}\n\nclass document {\n  /**\n   * @desc\n   * if form override action {@link override_attr}\n   * if no rewrite add _no_rewrite = true to object property\n   * return new element\n   */\n  createElement () {}\n\n  /**\n   * @desc\n   * Creates an element with the specified namespace URI and qualified name\n   * extract origin {@link extract_orig} from namespaceURI call\n   * return call to original method using extracted origin\n   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS\n   */\n  createElementNS () {}\n\n  /**\n   * {@link rewrite_html}\n   * @param string\n   */\n  write (string) {}\n\n  /**\n   * {@link rewrite_html}\n   * @param string\n   */\n  writeln (string) {}\n}\n\nclass Date {\n  /**\n   * @desc\n   * Override to create Date object using time of capture\n   */\n  constructor () {}\n\n  /**\n   * @desc\n   * Override to use original (not time of capture)\n   */\n  UTC () {}\n\n  /**\n   * @desc\n   * Override to use original (not time of capture)\n   */\n  parse () {}\n\n  /**\n   * @desc\n   * Override to time of capture\n   */\n  now () {}\n}\n\n/**\n * @desc\n * Disabled\n */\nclass Worker {\n}\n\nclass HTMLScriptElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLIFrameElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLStyleElement {\n  /**\n   * {@link override_html_assign}\n   */\n  get textContent () {}\n\n  /**\n   * {@link override_html_assign}\n   */\n  set textContent (arg) {}\n}\n\nclass HTMLSourceElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get srcset () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set srcset (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n\n  /**\n   * {@link rewrite_html}\n   */\n  get insertAdjacentHTML () {}\n\n  /**\n   * {@link rewrite_html}\n   */\n  set insertAdjacentHTML (arg) {}\n}\n\nclass CSSStyleDeclaration {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyle () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyle (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get backgroundImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set backgroundImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get cssText () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set cssText (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyleImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyleImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get border () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set border (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImageSource () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImageSource (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get background () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set background (args) {}\n}\n\nclass HTMLEmbedElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLImageElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLVideoElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get poster () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set poster (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass CSSStyleSheet {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get href () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set href (args) {}\n}\n\nclass HTMLObjectElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get data () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set data (args) {}\n}\n\nclass HTMLAudioElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get poster () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set poster (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass CSS2Properties {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyle () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyle (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get backgroundImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set backgroundImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get cssText () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set cssText (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyleImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyleImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get border () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set border (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImageSource () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImageSource (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get background () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set background (args) {}\n}\n\nclass HTMLInputElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLLinkElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get href () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set href (args) {}\n}\n\n/**\n * @desc\n * keep a copy of the original element get/set properties in back pocket\n * {@link init_loc_override}\n *\n */\nclass HTMLAnchorElement {\n\n}\n\n",
+    "content": "/**\n * @desc\n * Override attribute using getters and setters\n * @example\n * var orig_getter = get_orig_getter(obj, attr);\n * var orig_setter = get_orig_setter(obj, attr);\n *  var setter = function(orig) {\n *    var val = rewrite_url(orig, false, mod);\n *    if (orig_setter) {\n *      return orig_setter.call(this, val);\n *    } else if (default_to_setget) {\n *      return wb_setAttribute.call(this, attr, val);\n *    }\n *  }\n *  var getter = function() {\n *       var res = undefined;\n *      if (orig_getter) {\n *        res = orig_getter.call(this);\n *     } else if (default_to_setget) {\n *      res = wb_getAttribute.call(this, attr);\n *    }\n *    res = extract_orig(res);\n *       return res;\n *     }\n *  def_prop(obj, attr, setter, getter);\n */\nfunction override_attr (obj, attr, mod, default_to_setget) {}\n\n/**\n * @desc more fun times for url rewriting\n * {@link make_parser}\n * {@link def_prop}\n * @param loc_obj\n * @param orig_setter\n * @param orig_getter\n */\nfunction init_loc_override(loc_obj, orig_setter, orig_getter) {}\n\n/**\n* @example\n* if (!$wbwindow.DOMParser ||\n*   !elemtype ||\n*   !elemtype.prototype) {\n*   return;\n* }\n*\n* var obj = elemtype.prototype;\n*\n* var orig_getter = get_orig_getter(obj, prop);\n* var orig_setter = get_orig_setter(obj, prop);\n*\n* if (!orig_setter) {\n*   return;\n* }\n*\n* var setter = function(orig) {\n*   var res = orig;\n*   if (!this._no_rewrite) {\n*     //init_iframe_insert_obs(this);\n*     if (this.tagName == \"STYLE\") {\n*       res = rewrite_style(orig);\n*     } else {\n*       res = rewrite_html(orig);\n*     }\n*   }\n*   orig_setter.call(this, res);\n* }\n*\n* def_prop(obj, prop, setter, orig_getter);\n*/\nfunction override_html_assign(elemtype, prop) {}\n\n/**\n * @desc rewrite urls of the elements\n * @param elem\n * @param name\n * @param abs_url_only\n */\nfunction rewrite_attr(elem, name, abs_url_only) {}\n\n/**\n * @desc\n * {@link rewrite_attr}\n * @example\n * if (!elem) {\n *   return;\n * }\n *\n * var changed;\n *\n * if (elem.tagName == \"STYLE\") {\n *   var new_content = rewrite_style(elem.textContent);\n *   if (elem.textContent != new_content) {\n *     elem.textContent = new_content;\n *     changed = true;\n *   }\n * } else if (elem.tagName == \"OBJECT\") {\n *   changed = rewrite_attr(elem, \"data\", true);\n * } else if (elem.tagName == \"FORM\") {\n *   changed = rewrite_attr(elem, \"action\", true);\n * } else if (elem.tagName == \"INPUT\") {\n *   changed = rewrite_attr(elem, \"value\", true);\n * } else if (elem.tagName == \"IFRAME\" || elem.tagName == \"FRAME\") {\n *   changed = rewrite_frame_src(elem, \"src\");\n * } else {\n *   changed = rewrite_attr(elem, \"src\");\n *   changed = rewrite_attr(elem, \"srcset\") || changed;\n *   changed = rewrite_attr(elem, \"href\") || changed;\n *   changed = rewrite_attr(elem, \"style\") || changed;\n *   changed = rewrite_attr(elem, \"poster\") || changed;\n * }\n *\n * if (elem.getAttribute) {\n *   if (elem.getAttribute(\"crossorigin\")) {\n *     elem.removeAttribute(\"crossorigin\");\n *     changed = true;\n *   }\n *\n *   if (elem.getAttribute(\"integrity\")) {\n *     elem.removeAttribute(\"integrity\");\n *     changed = true;\n *   }\n * }\n *\n * return changed;\n *\n */\nfunction rewrite_elem (elem) {}\n\n/**\n * @desc\n * {@link rewrite_elem}\n * @example\n * if (!string) {\n *   return string;\n * }\n *\n * if (write_buff) {\n *   string = write_buff + string;\n *   write_buff = \"\";\n * }\n * var inner_doc = new DOMParser().parseFromString(string, \"text/html\");\n *\n * if (!inner_doc) {\n *   return string;\n * }\n *\n * string = string.toString();\n *\n * var changed = false;\n *\n * for (var i = 0; i < inner_doc.all.length; i++) {\n *   changed = rewrite_elem(inner_doc.all[i]) || changed;\n * }\n *\n * if (!changed) {\n *   return string;\n * }\n *\n * var new_html = \"\";\n *\n * // if original had <html> tag, add full document HTML\n * if (string && string.indexOf(\"<html\") >= 0) {\n *   new_html = inner_doc.documentElement.outerHTML;\n * } else {\n *   // otherwise, just add contents of head and body\n *   new_html = inner_doc.head.innerHTML;\n *   new_html += inner_doc.body.innerHTML;\n *\n *   if (check_end_tag) {\n *     if (inner_doc.all.length > 3) {\n *       var end_tag = \"</\" + inner_doc.all[3].tagName.toLowerCase() + \">\";\n *       if (ends_with(new_html, end_tag) && !ends_with(string, end_tag)) {\n *         new_html = new_html.substring(0, new_html.length - end_tag.length);\n *       }\n *     } else if (string[0] != \"<\" || string[string.length - 1] != \">\") {\n *       write_buff += string;\n *       return;\n *     }\n *   }\n * }\n *\n * return new_html;\n */\nfunction rewrite_html (string, check_end_tag) {}\n\n/**\n * @example\n * //imp\n * if (!src || src == \"\" || src == \"about:blank\" || src.indexOf(\"javascript:\") >= 0) {\n *   win._WBWombat = wombat_internal(win);\n *   win._wb_wombat = new win._WBWombat(wb_info);\n * } else {\n *   // These should get overriden when content is loaded, but just in case...\n *   //win._WB_wombat_location = win.location;\n *   //win.document.WB_wombat_location = win.document.location;\n *   //win._WB_wombat_top = $wbwindow.WB_wombat_top;\n *\n *   init_proto_pm_origin(win);\n *   //init_postmessage_override(win);\n * }\n *\n * @param win\n * @param src\n */\nfunction init_new_window_wombat (win, src) {}\n\n/**\n * @desc\n *  setup iframe for either captured pages or replay iframe\n * {@link init_new_window_wombat}\n * @example\n * // imp\n * var win;\n *\n * if (iframe._get_contentWindow) {\n *    win = iframe._get_contentWindow.call(iframe);\n *  } else {\n *    win = iframe.contentWindow;\n *  }\n *\n * try {\n *    if (!win || win == $wbwindow || win._skip_wombat || win._wb_wombat) {\n *      return;\n *    }\n *  } catch (e) {\n *   return;\n * }\n *\n * //var src = iframe.src;\n * var src = wb_getAttribute.call(iframe, \"src\");\n *\n * init_new_window_wombat(win, src);\n */\nfunction init_iframe_wombat (iframe) {}\n\n/**\n * @desc\n * replace dom function with own\n * {@link init_iframe_wombat}\n * @example\n * //imp\n * var orig = $wbwindow.Node.prototype[funcname];\n *\n * $wbwindow.Node.prototype[funcname] = function() {\n *   var child = arguments[0];\n *\n *   if (child) {\n *\n *     if (child instanceof $wbwindow.Element) {\n *       rewrite_elem(child);\n *     } else if (child instanceof $wbwindow.Text) {\n *       if (this.tagName == \"STYLE\") {\n *         child.textContent = rewrite_style(child.textContent);\n *       }\n *     }\n *\n *     // if fragment, rewrite children before adding\n *     //if (child instanceof DocumentFragment) {\n *     //   rewrite_children(child);\n *     //}\n *   }\n *\n *   var created = orig.apply(this, arguments);\n *\n *   if (created && created.tagName == \"IFRAME\") {\n *     init_iframe_wombat(created);\n *   }\n *\n *   return created;\n * }\n * @param funcname\n */\nfunction replace_dom_func (funcname) {}\n\n/**\n * @desc\n * if proxy mode no extraction\n * else if href contains ignored prefixes [\"#\", \"about:\", \"data:\", \"mailto:\", \"javascript:\", \"{\", \"*\"] ignore\n * else remove wb url part and return original\n * @param href\n * @return {string} original href\n */\nfunction extract_orig (href) {}\n\n/**\n* {@link override_attr}\n* @example\n* var do_init_forms = function() {\n*   for (var i = 0; i < $wbwindow.document.forms.length; i++) {\n*     var new_action = rewrite_url($wbwindow.document.forms[i].action);\n*     if (new_action != $wbwindow.document.forms[i].action) {\n*       $wbwindow.document.forms[i].action = new_action;\n*     }\n*     override_attr($wbwindow.document.forms[i], \"action\", \"\", true);\n*   }\n* }\n*\n* if (document.readyState == \"loading\") {\n*   document.addEventListener(\"DOMContentLoaded\", do_init_forms);\n* } else {\n*   do_init_forms();\n* }\n*/\nfunction init_form_overrides($wbwindow) {}\n\n/**\n * @desc\n *  create an a tag in top frame(not replay iframe)\n *  and use the tag to parse href after {@link extract_orig}\n *  special case: for newly opened blank windows, use the opener\n *     to create parser to have the proper baseURI\n * @param href\n * @returns {Element}\n */\nfunction make_parser (href) {}\n\n/**\n * @example\n * str.indexOf(\"www.\") == 0 -> true\n *\n * @example\n * // hostname:port (port required)\n * str.match(/^[\\w-]+(\\.[\\w-_]+)+(:\\d+)(\\/|$)/) and match len < 64 -> true\n *\n * @example\n * // ip:port\n * str.match(/^\\d+\\.\\d+\\.\\d+\\.\\d+(:\\d+)?(\\/|$)/) and match len < 64 -> true\n *\n * @param {string} str\n * @returns {boolean} if is host url\n */\nfunction is_host_url (str) {}\n\n/**\n * @desc Override a DOM property\n * @param {Object} obj  the object to define custom prop of\n * @param {String} prop the prop to be overridden\n * @param {function} set_func own setter function\n * @param {function} get_func own getter function\n * @param {boolean} enumerable is enumerable\n * @return {boolean|undefined} if override was successful or not\n */\nfunction def_prop (obj, prop, set_func, get_func, enumerable) {}\n\n/**\n *\n * @desc\n * override window.fetch\n * rewrite url and call original\n */\nfunction fetch (input, init) {}\n\nclass WombatLocation {\n  /**\n   * @desc override the win.location\n   * @param {Object} orig_loc\n   * @link WombatLocation.init_loc_override\n   */\n  constructor (orig_loc) {}\n\n  /**\n   * @desc\n   * override getters and setters for\n   * [\"href\", \"hash\", \"pathname\", \"host\", \"hostname\", \"protocol\", \"origin\", \"search\", \"port\"]\n   * @link WombatLocation.make_get_loc_prop\n   * @link WombatLocation.make_set_loc_prop\n   */\n  init_loc_override (loc_obj, orig_setter, orig_getter) {}\n\n  /**\n   * @desc\n   * call original if no rewrite else\n   *\n   * call original and if prop is href return extract origin\n   * if self.original_href != the current href set_loc to new href\n   * else value = this[\"_\" + prop] return value;\n   *\n   * @param prop\n   */\n  make_get_loc_prop (prop) {}\n\n  /**\n   * @desc\n   * call original if no rewrite else\n   * this[\"_\" + prop] = value;\n   * get original value\n   * if self.original_href != the current href set_loc to new href\n   * else\n   * value = this[\"_\" + prop] return value;\n   * check for Special case for href=\".\" assignment\n   * rewrite and update globals if changes actual location and call original setter\n   * @param prop\n   */\n  make_set_loc_prop (prop) {}\n\n  /**\n   * @example\n   * // the imp\n   * var new_url = rewrite_url(url);\n   *  var orig = extract_orig(new_url);\n   * if (orig == this.href) {\n   *       return orig;\n   * }\n   * return this._orig_loc.replace(new_url);\n   * @param {string} url\n   */\n  replace (url) {}\n\n  /**\n   * @example\n   * // the imp\n   * var new_url = rewrite_url(url);\n   * var orig = extract_orig(new_url);\n   * if (orig == this.href) {\n   *       return orig;\n   * }\n   * return this._orig_loc.assign(new_url);\n   * @param {string} url\n   */\n  assign (url) {}\n\n  reload (url) {}\n\n  /**\n   * @desc get a prop from original window.loc\n   * @param prop\n   */\n  orig_getter (prop) {}\n\n  /**\n   * @desc set a prop from original window.loc\n   * @param prop\n   */\n  orig_setter (prop) {}\n}\n\nclass Math {\n  constructor () {\n    /**\n     * @desc pywb determined number\n     * @type {number}\n     */\n    this.seed = 123;\n  }\n\n  /**\n   * @link Math.seeded_random\n   */\n  random () {}\n\n  /**\n   * @example\n   * // imp\n   *  $wbwindow.Math.seed = ($wbwindow.Math.seed * 9301 + 49297) % 233280;\n   *  return $wbwindow.Math.seed / 233280;\n   */\n  seeded_random () {}\n}\n\nclass Crypto {\n  /**\n   * uses {@link Math.random}\n   * @param array\n   */\n  getRandomValues (array) {}\n}\n\nclass History {\n  /**\n   * @link History.override_history_func\n   */\n  pushState () {}\n\n  /**\n   * @link History.override_history_func\n   */\n  replaceState () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  go () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  back () {}\n\n  /**\n   * @link History.override_history_nav\n   */\n  forward () {}\n\n  /**\n   * @desc\n   * rewrite url and house keeping with communication with top frame\n   */\n  override_history_func () {}\n\n  /**\n   * @desc\n   * rewrite url and house keeping with communication with top frame\n   * minute diff with other method\n   */\n  override_history_nav () {}\n\n}\n\nclass XMLHttpRequest {\n  /**\n   * @desc\n   * rewrite url if rewrite enabled\n   * call original check if url starts with data:\n   * if does set 'X-Pywb-Requested-With', 'XMLHttpRequest'\n   * @example\n   * if (!$wbwindow.XMLHttpRequest ||\n   * !$wbwindow.XMLHttpRequest.prototype ||\n   * !$wbwindow.XMLHttpRequest.prototype.open) {\n   *   return;\n   * }\n   *\n   * var orig = $wbwindow.XMLHttpRequest.prototype.open;\n   * function open_rewritten(method, url, async, user, password) {\n   *   if (!this._no_rewrite) {\n   *     url = rewrite_url(url);\n   *   }\n   *\n   *  // defaults to true\n   *  if (async != false) {\n   *   async = true;\n   *  }\n   *\n   *  result = orig.call(this, method, url, async, user, password);\n   *  if (!starts_with(url, \"data:\")) {\n   *   this.setRequestHeader('X-Pywb-Requested-With', 'XMLHttpRequest');\n   *  }\n   * }\n   *\n   * $wbwindow.XMLHttpRequest.prototype.open = open_rewritten;\n   */\n  open (method, url, async, user, password) {}\n}\n\nclass HTMLBaseElement {\n  /**\n   * @desc\n   * call original and if name name is href rewrite\n   * @param {string} name\n   */\n  getAttribute (name) {}\n\n  /**\n   * call {@link HTMLBaseElement.getAttribute}\n   * {@link def_prop}\n   */\n  get href () {}\n}\n\nclass Node {\n  /**\n   * @desc returns the absolute base URL of a node\n   * override it with own getter who call original and {@link extract_orig}\n   * {@link def_prop}\n   */\n  get baseURI () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  appendChild () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  inertBefore () {}\n\n  /**\n   * @desc\n   * {@link replace_dom_func}\n   */\n  replaceChild () {}\n}\n\nclass Element {\n  /**\n   * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute\n   * @desc\n   * rewrite [\"src\", \"href\", \"poster\"] attributes\n   * if script then add js_ to url\n   * if style and if value is string rewrite value urls\n   * call original\n   */\n  setAttribute () {}\n\n  /**\n   * @desc\n   * call original\n   * if [\"src\", \"href\", \"poster\"] attributes\n   * or attributes who start with data- or http://, https://, //\n   * extract origin from original call results\n   * return value\n   */\n  getAttribute () {}\n}\n\nclass HTMLElement {\n  /**\n   * {@link override_html_assign}\n   */\n  get innerHTML (){}\n}\n\nclass document {\n  /**\n   * @desc\n   * if form override action {@link override_attr}\n   * if no rewrite add _no_rewrite = true to object property\n   * return new element\n   */\n  createElement () {}\n\n  /**\n   * @desc\n   * Creates an element with the specified namespace URI and qualified name\n   * extract origin {@link extract_orig} from namespaceURI call\n   * return call to original method using extracted origin\n   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS\n   */\n  createElementNS () {}\n\n  /**\n   * {@link rewrite_html}\n   * @param string\n   */\n  write (string) {}\n\n  /**\n   * {@link rewrite_html}\n   * @param string\n   */\n  writeln (string) {}\n}\n\nclass Date {\n  /**\n   * @desc\n   * Override to create Date object using time of capture\n   */\n  constructor () {}\n\n  /**\n   * @desc\n   * Override to use original (not time of capture)\n   */\n  UTC () {}\n\n  /**\n   * @desc\n   * Override to use original (not time of capture)\n   */\n  parse () {}\n\n  /**\n   * @desc\n   * Override to time of capture\n   */\n  now () {}\n}\n\n/**\n * @desc\n * Disabled\n */\nclass Worker {\n}\n\nclass HTMLScriptElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLIFrameElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLStyleElement {\n  /**\n   * {@link override_html_assign}\n   */\n  get textContent () {}\n\n  /**\n   * {@link override_html_assign}\n   */\n  set textContent (arg) {}\n}\n\nclass HTMLSourceElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get srcset () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set srcset (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n\n  /**\n   * {@link rewrite_html}\n   */\n  get insertAdjacentHTML () {}\n\n  /**\n   * {@link rewrite_html}\n   */\n  set insertAdjacentHTML (arg) {}\n}\n\nclass CSSStyleDeclaration {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyle () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyle (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get backgroundImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set backgroundImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get cssText () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set cssText (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyleImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyleImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get border () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set border (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImageSource () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImageSource (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get background () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set background (args) {}\n}\n\nclass HTMLEmbedElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLImageElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLVideoElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get poster () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set poster (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass CSSStyleSheet {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get href () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set href (args) {}\n}\n\nclass HTMLObjectElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get data () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set data (args) {}\n}\n\nclass HTMLAudioElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get poster () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set poster (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass CSS2Properties {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyle () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyle (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get backgroundImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set backgroundImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get cssText () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set cssText (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get listStyleImage () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set listStyleImage (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get border () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set border (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get borderImageSource () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set borderImageSource (args) {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get background () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set background (args) {}\n}\n\nclass HTMLInputElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get src () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set src (args) {}\n}\n\nclass HTMLLinkElement {\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  get href () {}\n\n  /**\n   * @desc\n   * see {@link override_attr}\n   */\n  set href (args) {}\n}\n\n/**\n * @desc\n * keep a copy of the original element get/set properties in back pocket\n * {@link init_loc_override}\n * @example\n *  var anchor_orig = {}\n *\n *function save_prop(prop) {\n * anchor_orig[\"get_\" + prop] = get_orig_getter($wbwindow.HTMLAnchorElement.prototype, prop);\n * anchor_orig[\"set_\" + prop] = get_orig_setter($wbwindow.HTMLAnchorElement.prototype, prop);\n *}\n *\n *for (var i = 0; i < URL_PROPS.length; i++) {\n *  save_prop(URL_PROPS[i]);\n *}\n *\n *var anchor_setter = function(prop, value) {\n *  var func = anchor_orig[\"set_\" + prop];\n *  if (func) {\n *    return func.call(this, value);\n *  } else {\n *         return \"\";\n *  }\n *}\n *\n *var anchor_getter = function(prop) {\n *  var func = anchor_orig[\"get_\" + prop];\n *  if (func) {\n *    return func.call(this);\n *  } else {\n *    return \"\";\n *  }\n *}\n *\n *init_loc_override($wbwindow.HTMLAnchorElement.prototype, anchor_setter, anchor_getter);\n *$wbwindow.HTMLAnchorElement.prototype.toString = function () {\n *   return this.href;\n *};\n *\n */\nclass HTMLAnchorElement {\n\n}\n\n",
     "static": true,
     "longname": "toDoc/wombat.js",
     "access": null,
@@ -1211,7 +1211,10 @@
     "longname": "toDoc/wombat.js~XMLHttpRequest#open",
     "access": null,
     "description": "rewrite url if rewrite enabled\ncall original check if url starts with data:\nif does set 'X-Pywb-Requested-With', 'XMLHttpRequest'",
-    "lineNumber": 517,
+    "examples": [
+      "if (!$wbwindow.XMLHttpRequest ||\n!$wbwindow.XMLHttpRequest.prototype ||\n!$wbwindow.XMLHttpRequest.prototype.open) {\n  return;\n}\n\nvar orig = $wbwindow.XMLHttpRequest.prototype.open;\nfunction open_rewritten(method, url, async, user, password) {\n  if (!this._no_rewrite) {\n    url = rewrite_url(url);\n  }\n\n // defaults to true\n if (async != false) {\n  async = true;\n }\n\n result = orig.call(this, method, url, async, user, password);\n if (!starts_with(url, \"data:\")) {\n  this.setRequestHeader('X-Pywb-Requested-With', 'XMLHttpRequest');\n }\n}\n\n$wbwindow.XMLHttpRequest.prototype.open = open_rewritten;"
+    ],
+    "lineNumber": 542,
     "params": [
       {
         "name": "method",
@@ -1257,7 +1260,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 520,
+    "lineNumber": 545,
     "undocument": true,
     "unknown": [
       {
@@ -1278,7 +1281,7 @@
     "longname": "toDoc/wombat.js~HTMLBaseElement#getAttribute",
     "access": null,
     "description": "call original and if name name is href rewrite",
-    "lineNumber": 526,
+    "lineNumber": 551,
     "params": [
       {
         "nullable": null,
@@ -1303,7 +1306,7 @@
     "longname": "toDoc/wombat.js~HTMLBaseElement#href",
     "access": null,
     "description": "call {@link HTMLBaseElement.getAttribute}\n{@link def_prop}",
-    "lineNumber": 532
+    "lineNumber": 557
   },
   {
     "__docId__": 46,
@@ -1317,7 +1320,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 535,
+    "lineNumber": 560,
     "undocument": true,
     "unknown": [
       {
@@ -1338,7 +1341,7 @@
     "longname": "toDoc/wombat.js~Node#baseURI",
     "access": null,
     "description": "returns the absolute base URL of a node\noverride it with own getter who call original and {@link extract_orig}\n{@link def_prop}",
-    "lineNumber": 541
+    "lineNumber": 566
   },
   {
     "__docId__": 48,
@@ -1351,7 +1354,7 @@
     "longname": "toDoc/wombat.js~Node#appendChild",
     "access": null,
     "description": "{@link replace_dom_func}",
-    "lineNumber": 547,
+    "lineNumber": 572,
     "params": []
   },
   {
@@ -1365,7 +1368,7 @@
     "longname": "toDoc/wombat.js~Node#inertBefore",
     "access": null,
     "description": "{@link replace_dom_func}",
-    "lineNumber": 553,
+    "lineNumber": 578,
     "params": []
   },
   {
@@ -1379,7 +1382,7 @@
     "longname": "toDoc/wombat.js~Node#replaceChild",
     "access": null,
     "description": "{@link replace_dom_func}",
-    "lineNumber": 559,
+    "lineNumber": 584,
     "params": []
   },
   {
@@ -1394,7 +1397,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 562,
+    "lineNumber": 587,
     "undocument": true,
     "unknown": [
       {
@@ -1418,7 +1421,7 @@
     "see": [
       "https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute"
     ],
-    "lineNumber": 571,
+    "lineNumber": 596,
     "params": []
   },
   {
@@ -1432,7 +1435,7 @@
     "longname": "toDoc/wombat.js~Element#getAttribute",
     "access": null,
     "description": "call original\nif [\"src\", \"href\", \"poster\"] attributes\nor attributes who start with data- or http://, https://, //\nextract origin from original call results\nreturn value",
-    "lineNumber": 581,
+    "lineNumber": 606,
     "params": []
   },
   {
@@ -1447,7 +1450,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 584,
+    "lineNumber": 609,
     "undocument": true,
     "unknown": [
       {
@@ -1468,7 +1471,7 @@
     "longname": "toDoc/wombat.js~HTMLElement#innerHTML",
     "access": null,
     "description": "{@link override_html_assign}",
-    "lineNumber": 588
+    "lineNumber": 613
   },
   {
     "__docId__": 56,
@@ -1482,7 +1485,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 591,
+    "lineNumber": 616,
     "undocument": true,
     "unknown": [
       {
@@ -1503,7 +1506,7 @@
     "longname": "toDoc/wombat.js~document#createElement",
     "access": null,
     "description": "if form override action {@link override_attr}\nif no rewrite add _no_rewrite = true to object property\nreturn new element",
-    "lineNumber": 598,
+    "lineNumber": 623,
     "params": []
   },
   {
@@ -1520,7 +1523,7 @@
     "see": [
       "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS"
     ],
-    "lineNumber": 607,
+    "lineNumber": 632,
     "params": []
   },
   {
@@ -1534,7 +1537,7 @@
     "longname": "toDoc/wombat.js~document#write",
     "access": null,
     "description": "{@link rewrite_html}",
-    "lineNumber": 613,
+    "lineNumber": 638,
     "params": [
       {
         "nullable": null,
@@ -1559,7 +1562,7 @@
     "longname": "toDoc/wombat.js~document#writeln",
     "access": null,
     "description": "{@link rewrite_html}",
-    "lineNumber": 619,
+    "lineNumber": 644,
     "params": [
       {
         "nullable": null,
@@ -1585,7 +1588,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 622,
+    "lineNumber": 647,
     "undocument": true,
     "unknown": [
       {
@@ -1606,7 +1609,7 @@
     "longname": "toDoc/wombat.js~Date#constructor",
     "access": null,
     "description": "Override to create Date object using time of capture",
-    "lineNumber": 627,
+    "lineNumber": 652,
     "params": []
   },
   {
@@ -1620,7 +1623,7 @@
     "longname": "toDoc/wombat.js~Date#UTC",
     "access": null,
     "description": "Override to use original (not time of capture)",
-    "lineNumber": 633,
+    "lineNumber": 658,
     "params": []
   },
   {
@@ -1634,7 +1637,7 @@
     "longname": "toDoc/wombat.js~Date#parse",
     "access": null,
     "description": "Override to use original (not time of capture)",
-    "lineNumber": 639,
+    "lineNumber": 664,
     "params": []
   },
   {
@@ -1648,7 +1651,7 @@
     "longname": "toDoc/wombat.js~Date#now",
     "access": null,
     "description": "Override to time of capture",
-    "lineNumber": 645,
+    "lineNumber": 670,
     "params": []
   },
   {
@@ -1663,7 +1666,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": "Disabled",
-    "lineNumber": 652,
+    "lineNumber": 677,
     "interface": false
   },
   {
@@ -1678,7 +1681,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 655,
+    "lineNumber": 680,
     "undocument": true,
     "unknown": [
       {
@@ -1699,7 +1702,7 @@
     "longname": "toDoc/wombat.js~HTMLScriptElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 660
+    "lineNumber": 685
   },
   {
     "__docId__": 69,
@@ -1712,7 +1715,7 @@
     "longname": "toDoc/wombat.js~HTMLScriptElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 666,
+    "lineNumber": 691,
     "type": {
       "types": [
         "*"
@@ -1731,7 +1734,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 669,
+    "lineNumber": 694,
     "undocument": true,
     "unknown": [
       {
@@ -1752,7 +1755,7 @@
     "longname": "toDoc/wombat.js~HTMLIFrameElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 674
+    "lineNumber": 699
   },
   {
     "__docId__": 72,
@@ -1765,7 +1768,7 @@
     "longname": "toDoc/wombat.js~HTMLIFrameElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 680,
+    "lineNumber": 705,
     "type": {
       "types": [
         "*"
@@ -1784,7 +1787,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 683,
+    "lineNumber": 708,
     "undocument": true,
     "unknown": [
       {
@@ -1805,7 +1808,7 @@
     "longname": "toDoc/wombat.js~HTMLStyleElement#textContent",
     "access": null,
     "description": "{@link override_html_assign}",
-    "lineNumber": 687
+    "lineNumber": 712
   },
   {
     "__docId__": 75,
@@ -1818,7 +1821,7 @@
     "longname": "toDoc/wombat.js~HTMLStyleElement#textContent",
     "access": null,
     "description": "{@link override_html_assign}",
-    "lineNumber": 692,
+    "lineNumber": 717,
     "type": {
       "types": [
         "*"
@@ -1837,7 +1840,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 695,
+    "lineNumber": 720,
     "undocument": true,
     "unknown": [
       {
@@ -1858,7 +1861,7 @@
     "longname": "toDoc/wombat.js~HTMLSourceElement#srcset",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 700
+    "lineNumber": 725
   },
   {
     "__docId__": 78,
@@ -1871,7 +1874,7 @@
     "longname": "toDoc/wombat.js~HTMLSourceElement#srcset",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 706,
+    "lineNumber": 731,
     "type": {
       "types": [
         "*"
@@ -1889,7 +1892,7 @@
     "longname": "toDoc/wombat.js~HTMLSourceElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 712
+    "lineNumber": 737
   },
   {
     "__docId__": 80,
@@ -1902,7 +1905,7 @@
     "longname": "toDoc/wombat.js~HTMLSourceElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 718,
+    "lineNumber": 743,
     "type": {
       "types": [
         "*"
@@ -1920,7 +1923,7 @@
     "longname": "toDoc/wombat.js~HTMLSourceElement#insertAdjacentHTML",
     "access": null,
     "description": "{@link rewrite_html}",
-    "lineNumber": 723
+    "lineNumber": 748
   },
   {
     "__docId__": 82,
@@ -1933,7 +1936,7 @@
     "longname": "toDoc/wombat.js~HTMLSourceElement#insertAdjacentHTML",
     "access": null,
     "description": "{@link rewrite_html}",
-    "lineNumber": 728,
+    "lineNumber": 753,
     "type": {
       "types": [
         "*"
@@ -1952,7 +1955,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 731,
+    "lineNumber": 756,
     "undocument": true,
     "unknown": [
       {
@@ -1973,7 +1976,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyle",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 736
+    "lineNumber": 761
   },
   {
     "__docId__": 85,
@@ -1986,7 +1989,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyle",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 742,
+    "lineNumber": 767,
     "type": {
       "types": [
         "*"
@@ -2004,7 +2007,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 748
+    "lineNumber": 773
   },
   {
     "__docId__": 87,
@@ -2017,7 +2020,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 754,
+    "lineNumber": 779,
     "type": {
       "types": [
         "*"
@@ -2035,7 +2038,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#backgroundImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 760
+    "lineNumber": 785
   },
   {
     "__docId__": 89,
@@ -2048,7 +2051,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#backgroundImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 766,
+    "lineNumber": 791,
     "type": {
       "types": [
         "*"
@@ -2066,7 +2069,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#cssText",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 772
+    "lineNumber": 797
   },
   {
     "__docId__": 91,
@@ -2079,7 +2082,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#cssText",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 778,
+    "lineNumber": 803,
     "type": {
       "types": [
         "*"
@@ -2097,7 +2100,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyleImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 784
+    "lineNumber": 809
   },
   {
     "__docId__": 93,
@@ -2110,7 +2113,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#listStyleImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 790,
+    "lineNumber": 815,
     "type": {
       "types": [
         "*"
@@ -2128,7 +2131,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#border",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 796
+    "lineNumber": 821
   },
   {
     "__docId__": 95,
@@ -2141,7 +2144,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#border",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 802,
+    "lineNumber": 827,
     "type": {
       "types": [
         "*"
@@ -2159,7 +2162,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImageSource",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 808
+    "lineNumber": 833
   },
   {
     "__docId__": 97,
@@ -2172,7 +2175,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#borderImageSource",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 814,
+    "lineNumber": 839,
     "type": {
       "types": [
         "*"
@@ -2190,7 +2193,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#background",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 820
+    "lineNumber": 845
   },
   {
     "__docId__": 99,
@@ -2203,7 +2206,7 @@
     "longname": "toDoc/wombat.js~CSSStyleDeclaration#background",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 826,
+    "lineNumber": 851,
     "type": {
       "types": [
         "*"
@@ -2222,7 +2225,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 829,
+    "lineNumber": 854,
     "undocument": true,
     "unknown": [
       {
@@ -2243,7 +2246,7 @@
     "longname": "toDoc/wombat.js~HTMLEmbedElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 834
+    "lineNumber": 859
   },
   {
     "__docId__": 102,
@@ -2256,7 +2259,7 @@
     "longname": "toDoc/wombat.js~HTMLEmbedElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 840,
+    "lineNumber": 865,
     "type": {
       "types": [
         "*"
@@ -2275,7 +2278,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 843,
+    "lineNumber": 868,
     "undocument": true,
     "unknown": [
       {
@@ -2296,7 +2299,7 @@
     "longname": "toDoc/wombat.js~HTMLImageElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 848
+    "lineNumber": 873
   },
   {
     "__docId__": 105,
@@ -2309,7 +2312,7 @@
     "longname": "toDoc/wombat.js~HTMLImageElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 854,
+    "lineNumber": 879,
     "type": {
       "types": [
         "*"
@@ -2328,7 +2331,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 857,
+    "lineNumber": 882,
     "undocument": true,
     "unknown": [
       {
@@ -2349,7 +2352,7 @@
     "longname": "toDoc/wombat.js~HTMLVideoElement#poster",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 862
+    "lineNumber": 887
   },
   {
     "__docId__": 108,
@@ -2362,7 +2365,7 @@
     "longname": "toDoc/wombat.js~HTMLVideoElement#poster",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 868,
+    "lineNumber": 893,
     "type": {
       "types": [
         "*"
@@ -2380,7 +2383,7 @@
     "longname": "toDoc/wombat.js~HTMLVideoElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 874
+    "lineNumber": 899
   },
   {
     "__docId__": 110,
@@ -2393,7 +2396,7 @@
     "longname": "toDoc/wombat.js~HTMLVideoElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 880,
+    "lineNumber": 905,
     "type": {
       "types": [
         "*"
@@ -2412,7 +2415,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 883,
+    "lineNumber": 908,
     "undocument": true,
     "unknown": [
       {
@@ -2433,7 +2436,7 @@
     "longname": "toDoc/wombat.js~CSSStyleSheet#href",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 888
+    "lineNumber": 913
   },
   {
     "__docId__": 113,
@@ -2446,7 +2449,7 @@
     "longname": "toDoc/wombat.js~CSSStyleSheet#href",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 894,
+    "lineNumber": 919,
     "type": {
       "types": [
         "*"
@@ -2465,7 +2468,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 897,
+    "lineNumber": 922,
     "undocument": true,
     "unknown": [
       {
@@ -2486,7 +2489,7 @@
     "longname": "toDoc/wombat.js~HTMLObjectElement#data",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 902
+    "lineNumber": 927
   },
   {
     "__docId__": 116,
@@ -2499,7 +2502,7 @@
     "longname": "toDoc/wombat.js~HTMLObjectElement#data",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 908,
+    "lineNumber": 933,
     "type": {
       "types": [
         "*"
@@ -2518,7 +2521,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 911,
+    "lineNumber": 936,
     "undocument": true,
     "unknown": [
       {
@@ -2539,7 +2542,7 @@
     "longname": "toDoc/wombat.js~HTMLAudioElement#poster",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 916
+    "lineNumber": 941
   },
   {
     "__docId__": 119,
@@ -2552,7 +2555,7 @@
     "longname": "toDoc/wombat.js~HTMLAudioElement#poster",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 922,
+    "lineNumber": 947,
     "type": {
       "types": [
         "*"
@@ -2570,7 +2573,7 @@
     "longname": "toDoc/wombat.js~HTMLAudioElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 928
+    "lineNumber": 953
   },
   {
     "__docId__": 121,
@@ -2583,7 +2586,7 @@
     "longname": "toDoc/wombat.js~HTMLAudioElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 934,
+    "lineNumber": 959,
     "type": {
       "types": [
         "*"
@@ -2602,7 +2605,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 937,
+    "lineNumber": 962,
     "undocument": true,
     "unknown": [
       {
@@ -2623,7 +2626,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#listStyle",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 942
+    "lineNumber": 967
   },
   {
     "__docId__": 124,
@@ -2636,7 +2639,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#listStyle",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 948,
+    "lineNumber": 973,
     "type": {
       "types": [
         "*"
@@ -2654,7 +2657,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#borderImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 954
+    "lineNumber": 979
   },
   {
     "__docId__": 126,
@@ -2667,7 +2670,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#borderImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 960,
+    "lineNumber": 985,
     "type": {
       "types": [
         "*"
@@ -2685,7 +2688,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#backgroundImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 966
+    "lineNumber": 991
   },
   {
     "__docId__": 128,
@@ -2698,7 +2701,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#backgroundImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 972,
+    "lineNumber": 997,
     "type": {
       "types": [
         "*"
@@ -2716,7 +2719,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#cssText",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 978
+    "lineNumber": 1003
   },
   {
     "__docId__": 130,
@@ -2729,7 +2732,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#cssText",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 984,
+    "lineNumber": 1009,
     "type": {
       "types": [
         "*"
@@ -2747,7 +2750,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#listStyleImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 990
+    "lineNumber": 1015
   },
   {
     "__docId__": 132,
@@ -2760,7 +2763,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#listStyleImage",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 996,
+    "lineNumber": 1021,
     "type": {
       "types": [
         "*"
@@ -2778,7 +2781,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#border",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1002
+    "lineNumber": 1027
   },
   {
     "__docId__": 134,
@@ -2791,7 +2794,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#border",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1008,
+    "lineNumber": 1033,
     "type": {
       "types": [
         "*"
@@ -2809,7 +2812,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#borderImageSource",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1014
+    "lineNumber": 1039
   },
   {
     "__docId__": 136,
@@ -2822,7 +2825,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#borderImageSource",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1020,
+    "lineNumber": 1045,
     "type": {
       "types": [
         "*"
@@ -2840,7 +2843,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#background",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1026
+    "lineNumber": 1051
   },
   {
     "__docId__": 138,
@@ -2853,7 +2856,7 @@
     "longname": "toDoc/wombat.js~CSS2Properties#background",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1032,
+    "lineNumber": 1057,
     "type": {
       "types": [
         "*"
@@ -2872,7 +2875,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 1035,
+    "lineNumber": 1060,
     "undocument": true,
     "unknown": [
       {
@@ -2893,7 +2896,7 @@
     "longname": "toDoc/wombat.js~HTMLInputElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1040
+    "lineNumber": 1065
   },
   {
     "__docId__": 141,
@@ -2906,7 +2909,7 @@
     "longname": "toDoc/wombat.js~HTMLInputElement#src",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1046,
+    "lineNumber": 1071,
     "type": {
       "types": [
         "*"
@@ -2925,7 +2928,7 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 1049,
+    "lineNumber": 1074,
     "undocument": true,
     "unknown": [
       {
@@ -2946,7 +2949,7 @@
     "longname": "toDoc/wombat.js~HTMLLinkElement#href",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1054
+    "lineNumber": 1079
   },
   {
     "__docId__": 144,
@@ -2959,7 +2962,7 @@
     "longname": "toDoc/wombat.js~HTMLLinkElement#href",
     "access": null,
     "description": "see {@link override_attr}",
-    "lineNumber": 1060,
+    "lineNumber": 1085,
     "type": {
       "types": [
         "*"
@@ -2978,7 +2981,10 @@
     "importPath": "archive_page_mods/toDoc/wombat.js",
     "importStyle": null,
     "description": "keep a copy of the original element get/set properties in back pocket\n{@link init_loc_override}",
-    "lineNumber": 1069,
+    "examples": [
+      " var anchor_orig = {}\n\nfunction save_prop(prop) {\nanchor_orig[\"get_\" + prop] = get_orig_getter($wbwindow.HTMLAnchorElement.prototype, prop);\nanchor_orig[\"set_\" + prop] = get_orig_setter($wbwindow.HTMLAnchorElement.prototype, prop);\n}\n\nfor (var i = 0; i < URL_PROPS.length; i++) {\n save_prop(URL_PROPS[i]);\n}\n\nvar anchor_setter = function(prop, value) {\n var func = anchor_orig[\"set_\" + prop];\n if (func) {\n   return func.call(this, value);\n } else {\n        return \"\";\n }\n}\n\nvar anchor_getter = function(prop) {\n var func = anchor_orig[\"get_\" + prop];\n if (func) {\n   return func.call(this);\n } else {\n   return \"\";\n }\n}\n\ninit_loc_override($wbwindow.HTMLAnchorElement.prototype, anchor_setter, anchor_getter);\n$wbwindow.HTMLAnchorElement.prototype.toString = function () {\n  return this.href;\n};"
+    ],
+    "lineNumber": 1128,
     "interface": false
   },
   {

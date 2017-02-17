@@ -594,6 +594,31 @@ class XMLHttpRequest {
    * rewrite url if rewrite enabled
    * call original check if url starts with data:
    * if does set &apos;X-Pywb-Requested-With&apos;, &apos;XMLHttpRequest&apos;
+   * @example
+   * if (!$wbwindow.XMLHttpRequest ||
+   * !$wbwindow.XMLHttpRequest.prototype ||
+   * !$wbwindow.XMLHttpRequest.prototype.open) {
+   *   return;
+   * }
+   *
+   * var orig = $wbwindow.XMLHttpRequest.prototype.open;
+   * function open_rewritten(method, url, async, user, password) {
+   *   if (!this._no_rewrite) {
+   *     url = rewrite_url(url);
+   *   }
+   *
+   *  // defaults to true
+   *  if (async != false) {
+   *   async = true;
+   *  }
+   *
+   *  result = orig.call(this, method, url, async, user, password);
+   *  if (!starts_with(url, &quot;data:&quot;)) {
+   *   this.setRequestHeader(&apos;X-Pywb-Requested-With&apos;, &apos;XMLHttpRequest&apos;);
+   *  }
+   * }
+   *
+   * $wbwindow.XMLHttpRequest.prototype.open = open_rewritten;
    */
   open (method, url, async, user, password) {}
 }
@@ -1145,6 +1170,40 @@ class HTMLLinkElement {
  * @desc
  * keep a copy of the original element get/set properties in back pocket
  * {@link init_loc_override}
+ * @example
+ *  var anchor_orig = {}
+ *
+ *function save_prop(prop) {
+ * anchor_orig[&quot;get_&quot; + prop] = get_orig_getter($wbwindow.HTMLAnchorElement.prototype, prop);
+ * anchor_orig[&quot;set_&quot; + prop] = get_orig_setter($wbwindow.HTMLAnchorElement.prototype, prop);
+ *}
+ *
+ *for (var i = 0; i &lt; URL_PROPS.length; i++) {
+ *  save_prop(URL_PROPS[i]);
+ *}
+ *
+ *var anchor_setter = function(prop, value) {
+ *  var func = anchor_orig[&quot;set_&quot; + prop];
+ *  if (func) {
+ *    return func.call(this, value);
+ *  } else {
+ *         return &quot;&quot;;
+ *  }
+ *}
+ *
+ *var anchor_getter = function(prop) {
+ *  var func = anchor_orig[&quot;get_&quot; + prop];
+ *  if (func) {
+ *    return func.call(this);
+ *  } else {
+ *    return &quot;&quot;;
+ *  }
+ *}
+ *
+ *init_loc_override($wbwindow.HTMLAnchorElement.prototype, anchor_setter, anchor_getter);
+ *$wbwindow.HTMLAnchorElement.prototype.toString = function () {
+ *   return this.href;
+ *};
  *
  */
 class HTMLAnchorElement {
